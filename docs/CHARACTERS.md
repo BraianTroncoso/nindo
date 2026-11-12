@@ -58,13 +58,28 @@ draw it still.
 | `transition.particles` | How many sparks fly outward. They are placed deterministically, never randomly. |
 | `transition.durationMs` | How long the whole change takes. Keep it under ~1.2 s or it stops feeling like a punch. |
 
-Sprite sheets are supported too, if you have real frame animation:
+### If you do have real frame animation
+
+Two extra pose kinds, both optional.
+
+A **sprite sheet** — one horizontal strip of equal frames:
 
 ```json
 "idle": { "kind": "sprite", "src": "idle-sheet.png", "frames": 8, "fps": 10 }
 ```
 
-A horizontal strip of equal frames. The engine animates `background-position`.
+A **frame sequence** — separate files, played once as the transformation. `##`
+is replaced by the 1-based frame number, zero padded to the width you wrote:
+
+```json
+"transform": { "kind": "sequence", "src": "seq/##.webp", "frames": 24, "fps": 22 }
+```
+
+`poses.transform` sits between `idle` and `active`. Packs without it get the
+crossfade, which is plenty. Sequences are only downloaded once a session passes
+80%, so a pack with one costs nothing until the moment it fires — but keep the
+whole sequence under ~400 kB anyway. The `naruto` pack is the worked example:
+24 frames, 420×420, 293 kB.
 
 ## 3. Drop the art and register it
 

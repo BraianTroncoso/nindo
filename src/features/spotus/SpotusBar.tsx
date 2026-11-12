@@ -29,6 +29,7 @@ export function SpotusBar() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [results, setResults] = useState<Track[] | null>(null);
+  const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const current = playlist.find((t) => t.id === currentId) ?? null;
@@ -80,18 +81,25 @@ export function SpotusBar() {
   return (
     <section
       className="spotus"
-      aria-label="Spotus player"
-      onDragOver={(e) => e.preventDefault()}
+      aria-label="Spotus"
+      data-drag={dragging ? "" : undefined}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragging(true);
+      }}
+      onDragLeave={() => setDragging(false)}
       onDrop={(e) => {
         e.preventDefault();
+        setDragging(false);
         onFiles(e.dataTransfer.files);
       }}
     >
-      <div className="spotus__row">
-        <div className="spotus__modes">
+      <header className="panel__head">
+        <h2>Spotus</h2>
+        <div className="panel__modes">
           <button
             type="button"
-            className="chip"
+            className="tool"
             data-on={mode === "paste" ? "" : undefined}
             onClick={() => setMode("paste")}
           >
@@ -99,73 +107,41 @@ export function SpotusBar() {
           </button>
           <button
             type="button"
-            className="chip"
+            className="tool"
             data-on={mode === "search" ? "" : undefined}
+            data-locked={apiKey ? undefined : ""}
             onClick={() => setMode("search")}
-            title={apiKey ? "Search YouTube" : "Needs your own YouTube API key (settings)"}
+            title={apiKey ? "Search YouTube" : "Needs your own YouTube API key — see settings"}
           >
-            search{apiKey ? "" : " *"}
+            search
           </button>
         </div>
+      </header>
 
-        <form className="spotus__form" onSubmit={onSubmit}>
-          <input
-            className="input"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder={
-              mode === "paste" ? "paste a YouTube video or playlist URL" : "search YouTube…"
-            }
-            aria-label={mode === "paste" ? "YouTube URL" : "Search query"}
-          />
-          <button type="submit" className="btn" disabled={busy}>
-            {busy ? "…" : mode === "paste" ? "Add" : "Go"}
-          </button>
-        </form>
+      <form className="spotus__form" onSubmit={onSubmit}>
+        <input
+          className="input"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder={mode === "paste" ? "paste a YouTube link" : "search YouTube…"}
+          aria-label={mode === "paste" ? "YouTube URL" : "Search query"}
+        />
+        <button type="submit" className="tool" disabled={busy}>
+          {busy ? "…" : mode === "paste" ? "Add" : "Go"}
+        </button>
+      </form>
 
-        <div className="spotus__transport">
-          <button type="button" className="btn btn--icon" onClick={() => playNext(-1)} aria-label="Previous">
-            ‹‹
-          </button>
-          <button
-            type="button"
-            className="btn btn--icon"
-            onClick={() => setPlaying(!playing)}
-            disabled={!current}
-            aria-label={playing ? "Pause" : "Play"}
-          >
-            {playing ? "❚❚" : "▶"}
-          </button>
-          <button type="button" className="btn btn--icon" onClick={() => playNext(1)} aria-label="Next">
-            ››
-          </button>
-          <input
-            className="spotus__volume"
-            type="range"
-            min={0}
-            max={100}
-            value={Math.round(volume * 100)}
-            onChange={(e) => updateSettings({ volume: Number(e.target.value) / 100 })}
-            aria-label="Volume"
-          />
-          <button
-            type="button"
-            className="btn btn--icon"
-            onClick={() => updateSettings({ showPlayer: !showPlayer })}
-            title={showPlayer ? "Collapse the player" : "Expand the player"}
-          >
-            {showPlayer ? "▾" : "▴"}
-          </button>
-        </div>
-      </div>
-
-      {message ? <p className="spotus__message">{message}</p> : null}
+      {message ? (
+        <p className="note note--warn" role="status">
+          {message}
+        </p>
+      ) : null}
 
       {results ? (
-        <div className="spotus__results">
+        <div className="results">
           <header>
             <span>results</span>
-            <button type="button" className="chip" onClick={() => setResults(null)}>
+            <button type="button" className="tool" onClick={() => setResults(null)}>
               close
             </button>
           </header>
@@ -180,8 +156,8 @@ export function SpotusBar() {
                     setResults(null);
                   }}
                 >
-                  <span className="spotus__title">{track.title}</span>
-                  <span className="spotus__author">{track.author}</span>
+                  <span className="track__title">{track.title}</span>
+                  <span className="track__by">{track.author}</span>
                 </button>
               </li>
             ))}
@@ -189,10 +165,10 @@ export function SpotusBar() {
         </div>
       ) : null}
 
-      {showPlayer ? (
-        <div className="spotus__body">
-          <div className="player">
-            {current?.source === "local" ? (
+      {current ? (
+        <div className="player" data-open={showPlayer ? "" : undefined}>
+          {showPlayer ? (
+            current.source === "local" ? (
               <LocalPlayer
                 track={current}
                 playing={playing}
@@ -202,7 +178,7 @@ export function SpotusBar() {
                 onNext={() => playNext(1)}
                 onPrevious={() => playNext(-1)}
               />
-            ) : current ? (
+            ) : (
               <YouTubePlayer
                 key={current.id}
                 track={current}
@@ -212,46 +188,84 @@ export function SpotusBar() {
                 onEnded={() => playNext(1)}
                 onError={setMessage}
               />
-            ) : (
-              <p className="player__empty">
-                Paste a link, search, or drop an audio file anywhere in this bar.
-              </p>
-            )}
-          </div>
+            )
+          ) : null}
 
-          <ul className="queue">
-            {playlist.map((track) => (
-              <li key={track.id} className="queue__item" data-on={track.id === currentId ? "" : undefined}>
-                <button type="button" className="queue__play" onClick={() => playTrack(track.id)}>
-                  <span className="spotus__title">{track.title}</span>
-                  <span className="spotus__author">{track.author ?? track.source}</span>
-                </button>
-                <button
-                  type="button"
-                  className="queue__remove"
-                  onClick={() => removeTrack(track.id)}
-                  aria-label={`Remove ${track.title}`}
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-            <li className="queue__drop">
-              <label className="chip">
-                + local audio
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="audio/*"
-                  multiple
-                  onChange={(e) => onFiles(e.target.files)}
-                  aria-label="Add local audio files"
-                />
-              </label>
-            </li>
-          </ul>
+          <div className="now">
+            <span className="track__title">{current.title}</span>
+            <span className="track__by">{current.author ?? current.source}</span>
+          </div>
         </div>
-      ) : null}
+      ) : (
+        <p className="note">Paste a link, or drop audio files anywhere in this panel.</p>
+      )}
+
+      <div className="transport">
+        <button type="button" className="tool" onClick={() => playNext(-1)} aria-label="Previous">
+          ‹‹
+        </button>
+        <button
+          type="button"
+          className="tool"
+          onClick={() => setPlaying(!playing)}
+          disabled={!current}
+          aria-label={playing ? "Pause" : "Play"}
+        >
+          {playing ? "❚❚" : "▶"}
+        </button>
+        <button type="button" className="tool" onClick={() => playNext(1)} aria-label="Next">
+          ››
+        </button>
+        <input
+          className="volume"
+          type="range"
+          min={0}
+          max={100}
+          value={Math.round(volume * 100)}
+          onChange={(e) => updateSettings({ volume: Number(e.target.value) / 100 })}
+          aria-label="Volume"
+        />
+        <button
+          type="button"
+          className="tool"
+          onClick={() => updateSettings({ showPlayer: !showPlayer })}
+          title={showPlayer ? "Hide the video" : "Show the video"}
+          aria-pressed={showPlayer}
+        >
+          {showPlayer ? "▾" : "▸"}
+        </button>
+      </div>
+
+      <ul className="queue">
+        {playlist.map((track) => (
+          <li key={track.id} className="queue__row" data-on={track.id === currentId ? "" : undefined}>
+            <button type="button" className="queue__play" onClick={() => playTrack(track.id)}>
+              <span className="track__title">{track.title}</span>
+              <span className="track__by">{track.author ?? track.source}</span>
+            </button>
+            <button
+              type="button"
+              className="queue__x"
+              onClick={() => removeTrack(track.id)}
+              aria-label={`Remove ${track.title}`}
+            >
+              ×
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <label className="drop">
+        add local audio
+        <input
+          ref={fileRef}
+          type="file"
+          accept="audio/*"
+          multiple
+          onChange={(e) => onFiles(e.target.files)}
+          aria-label="Add local audio files"
+        />
+      </label>
     </section>
   );
 }

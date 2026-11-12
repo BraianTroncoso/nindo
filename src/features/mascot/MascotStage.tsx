@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
+import { SequencePlayer } from "./SequencePlayer";
 import {
   DEFAULT_TRANSITION,
   poseUrl,
+  sequenceUrls,
   type CharacterPack,
   type MascotState,
   type Pose,
@@ -19,22 +21,26 @@ type Props = {
 /**
  * The animation engine every pack shares.
  *
- * Packs ship two still images; everything that makes the transformation feel
- * alive — breathing, the charging aura, the flash, the shake, the sparks — is
- * CSS driven by two custom properties. That is why a contributor can add a
- * mascot without writing a line of code.
+ * A pack ships still poses; the breathing, the charging aura, the flash, the
+ * shake and the sparks live here. Packs that also ship a frame sequence get it
+ * played once over the top. Either way a contributor writes no code.
  */
 export function MascotStage({ pack, charge, state }: Props) {
   const transition = { ...DEFAULT_TRANSITION, ...pack.transition };
-  const particles = useMemo(
-    () => buildParticles(transition.particles),
-    [transition.particles],
+  const particles = useMemo(() => buildParticles(transition.particles), [transition.particles]);
+
+  const transform = pack.poses.transform;
+  const frames = useMemo(
+    () => (transform?.kind === "sequence" ? sequenceUrls(pack.id, transform) : []),
+    [pack.id, transform],
   );
+  const transforming = state === "transforming";
 
   return (
     <div
       className="mascot"
       data-state={state}
+      data-sequence={frames.length > 0 ? "" : undefined}
       style={
         {
           "--charge": charge.toFixed(3),
@@ -49,11 +55,21 @@ export function MascotStage({ pack, charge, state }: Props) {
       <div className="mascot__poses">
         <PoseLayer pack={pack} pose={pack.poses.idle} slot="idle" />
         <PoseLayer pack={pack} pose={pack.poses.active} slot="active" />
+        {frames.length > 0 ? (
+          <SequencePlayer
+            urls={frames}
+            fps={transform?.fps ?? 24}
+            playing={transforming}
+            // Arm the download near the end of the session, not before.
+            preload={charge > 0.8 || transforming}
+            alt={`${pack.name} entering sage mode`}
+          />
+        ) : null}
       </div>
 
       {transition.flash ? <div className="mascot__flash" aria-hidden /> : null}
 
-      {state === "transforming" && transition.particles > 0 ? (
+      {transforming && transition.particles > 0 ? (
         <div className="mascot__particles" aria-hidden>
           {particles.map((p, i) => (
             <span
@@ -116,6 +132,7 @@ function PoseLayer({
       src={url}
       alt={label}
       draggable={false}
+      fetchPriority={slot === "idle" ? "high" : "low"}
     />
   );
 }

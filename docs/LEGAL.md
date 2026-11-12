@@ -14,23 +14,33 @@ Licensed **per pack**, declared in each `character.json`. Two kinds exist:
 | Pack | Licence | What that means |
 |---|---|---|
 | `ember` | `CC0-1.0` | Original art, public domain. No permission needed, no attribution needed. |
-| `naruto` | `fan-art` | Original vector drawings **of a character somebody else owns**. |
+| `naruto` | `fan-art` | Frames **from the anime itself**. Not ours, not licensable by us. |
 
 ## About the `naruto` pack
 
 Naruto is © Masashi Kishimoto / Shueisha / Pierrot. **nindo is not affiliated
-with, endorsed by, or licensed by any of them.** The drawings in that pack were
-made for this project, but the character they depict is not ours — so:
+with, endorsed by, or licensed by any of them.**
+
+That pack is not drawn art. It is **frames lifted from the Naruto Shippuden
+anime** — the sage-mode awakening, cropped square and re-encoded — sourced from
+[a fan project](https://github.com/LOSXinfinity/Naruto-25th-Anniversary-) that
+publishes them with no licence of its own. That is a stronger copyright claim
+than fan art, not a weaker one: it is the rights holders' actual footage, and
+nobody in the chain can grant permission to redistribute it. So:
 
 - that pack is **not** CC0 and **not** MIT, whatever the rest of the repo says;
 - it is **not for commercial use**;
 - if a rights holder asks, the folder gets deleted. The app keeps working: the
   mascot system is pluggable and `ember` is always there.
 
-We are not pretending this is bulletproof. Fan art of a living franchise is
-tolerated far more often than it is licensed, and "non-commercial" and "we meant
-well" are mitigations, not permissions. The pack is isolated in its own folder
-precisely so that removing it costs one commit.
+We are not pretending this is defensible. Redistributing frames from a currently
+licensed anime is infringement; "non-commercial" and "we meant well" are
+mitigations of the consequences, not permissions. The pack is isolated in its own
+folder precisely so that removing it costs one commit and breaks nothing.
+
+If you are forking nindo for anything public or commercial, delete
+`src/characters/naruto/` and `public/characters/naruto/` first and ship with
+`ember`, which is CC0 and genuinely yours to use.
 
 ## If you contribute a pack
 

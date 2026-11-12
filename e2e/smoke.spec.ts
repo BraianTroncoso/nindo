@@ -101,7 +101,7 @@ test("a task can be aimed at, and finishing a session credits it", async ({ page
   await seedRunningSession(page, 2500);
   await page.goto("/");
 
-  await expect(page.locator(".task__title")).toHaveText("wire up the player");
+  await expect(page.locator(".task__name")).toHaveText("wire up the player");
   await expect(page.locator(".clock__task")).toContainText("wire up the player");
   await expect(page.locator(".task[data-active]")).toBeVisible();
 
@@ -119,9 +119,9 @@ test("a task can be aimed at, and finishing a session credits it", async ({ page
   await page.screenshot(SHOT("04-sage-mode"));
 
   // The session is credited to the task and the break is queued.
-  await expect(page.locator(".task__pomodoros")).toHaveText("●");
-  await expect(page.locator(".clock__phase")).toHaveText("short break");
-  await expect(page.locator(".cycle__count")).toHaveText("1 today");
+  await expect(page.locator(".task__count")).toHaveText("1");
+  await expect(page.locator(".clock__phase")).toContainText("short break");
+  await expect(page.locator(".cadence__count")).toHaveText("1 done today");
 
   expect(errors).toEqual([]);
 });
@@ -132,8 +132,8 @@ test("the timer survives a deadline that passed while the tab was away", async (
   await page.goto("/");
 
   // Exactly one completion is reported, not eight hours' worth of cycles.
-  await expect(page.locator(".clock__phase")).toHaveText("short break");
-  await expect(page.locator(".cycle__count")).toHaveText("1 today");
+  await expect(page.locator(".clock__phase")).toContainText("short break");
+  await expect(page.locator(".cadence__count")).toHaveText("1 done today");
   await expect(page.locator(".clock__time")).toHaveText("5:00");
 });
 
@@ -144,7 +144,7 @@ test("the mascot can be switched off and the clock takes the centre", async ({ p
   await page.getByLabel("Close settings").click();
 
   await expect(page.locator(".mascot")).toHaveCount(0);
-  await expect(page.locator('.stage[data-mascot="off"]')).toBeVisible();
+  await expect(page.locator('.hero[data-mascot="off"]')).toBeVisible();
   await expect(page.locator(".clock__time")).toBeVisible();
   await page.screenshot(SHOT("05-no-mascot"));
 });
@@ -172,7 +172,7 @@ test("a pasted YouTube link resolves its real title with no API key", async ({ p
   await page.getByRole("button", { name: "Add", exact: true }).click();
 
   // oEmbed is keyless and CORS-enabled, so the title arrives client-side.
-  const title = page.locator(".queue__item .spotus__title").first();
+  const title = page.locator(".queue__row .track__title").first();
   await expect(title).toBeVisible({ timeout: 15_000 });
   await expect(title).not.toHaveText("jfKfPfyJRdk", { timeout: 15_000 });
   await page.screenshot(SHOT("07-spotus-queue"));
@@ -184,8 +184,8 @@ test("junk input is rejected with an explanation", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("YouTube URL").fill("https://vimeo.com/123456");
   await page.getByRole("button", { name: "Add", exact: true }).click();
-  await expect(page.locator(".spotus__message")).toContainText("not a YouTube link");
-  await expect(page.locator(".queue__item")).toHaveCount(0);
+  await expect(page.locator(".note--warn")).toContainText("not a YouTube link");
+  await expect(page.locator(".queue__row")).toHaveCount(0);
 });
 
 test("zen mode strips everything but the mascot and the clock", async ({ page }) => {
@@ -216,7 +216,7 @@ test("today's tasks are wiped when the calendar day changes", async ({ page }) =
   await page.reload();
 
   await expect(page.locator(".task")).toHaveCount(0);
-  await expect(page.locator(".tasks__empty")).toBeVisible();
+  await expect(page.locator(".tasks .note")).toBeVisible();
 });
 
 test("the app shell works offline once installed", async ({ page, context }) => {
@@ -232,4 +232,29 @@ test("the app shell works offline once installed", async ({ page, context }) => 
   await expect(page.locator('.mascot__pose[data-slot="idle"]')).toBeVisible();
   await page.screenshot(SHOT("09-offline"));
   await context.setOffline(false);
+});
+
+test("the layout holds up from a wide monitor down to a phone", async ({ page }) => {
+  await seedRunningSession(page, 60_000);
+  await page.goto("/");
+
+  for (const [name, width, height] of [
+    ["wide", 1680, 1050],
+    ["laptop", 1280, 800],
+    ["tablet", 900, 1000],
+    ["phone", 390, 844],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await page.waitForTimeout(150);
+
+    // Nothing may overflow horizontally at any width — the classic responsive bug.
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow, `horizontal overflow at ${name}`).toBeLessThanOrEqual(1);
+
+    await expect(page.locator(".clock__time")).toBeVisible();
+    await expect(page.locator(".mascot")).toBeVisible();
+    await page.screenshot({ path: `e2e/.artifacts/10-${name}.png`, fullPage: width < 1000 });
+  }
 });

@@ -29,17 +29,16 @@ export function TaskList() {
     };
   }, [rollDay]);
 
-  const remaining = tasks.filter((t) => !t.done).length;
+  const left = tasks.filter((t) => !t.done).length;
 
   return (
-    <aside className="tasks" aria-label="Today's tasks">
-      <header className="tasks__head">
+    <section className="tasks" aria-label="Today's tasks">
+      <header className="panel__head">
         <h2>Today</h2>
-        <span className="tasks__count">{remaining ? `${remaining} left` : "clear"}</span>
+        <span className="panel__meta">{tasks.length === 0 ? "" : left ? `${left} left` : "all done"}</span>
       </header>
 
       <form
-        className="tasks__form"
         onSubmit={(e) => {
           e.preventDefault();
           addTask(draft);
@@ -50,48 +49,49 @@ export function TaskList() {
           className="input"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="what are you doing today?"
+          placeholder="what are you working on?"
           maxLength={120}
           aria-label="New task"
         />
       </form>
 
-      <ul className="tasks__list">
+      <ul className="list">
         {tasks.map((task) => (
-          <li key={task.id} className="task" data-done={task.done ? "" : undefined} data-active={task.id === activeTaskId ? "" : undefined}>
+          <li
+            key={task.id}
+            className="task"
+            data-done={task.done ? "" : undefined}
+            data-active={task.id === activeTaskId ? "" : undefined}
+          >
             <button
               type="button"
-              className="task__check"
+              className="task__box"
               onClick={() => toggleTask(task.id)}
+              aria-pressed={task.done}
               aria-label={task.done ? `Mark ${task.title} as not done` : `Mark ${task.title} as done`}
+            />
+
+            <button
+              type="button"
+              className="task__name"
+              onClick={() => {
+                focusTask(task.id);
+                startTimer();
+              }}
+              title="Aim the timer at this and start"
             >
-              {task.done ? "✓" : ""}
+              {task.title}
             </button>
 
-            <span className="task__title">{task.title}</span>
-
             {task.pomodoros > 0 ? (
-              <span className="task__pomodoros" title={`${task.pomodoros} focus sessions`}>
-                {"●".repeat(Math.min(task.pomodoros, 5))}
-                {task.pomodoros > 5 ? `+${task.pomodoros - 5}` : ""}
+              <span className="task__count" title={`${task.pomodoros} focus sessions`}>
+                {task.pomodoros}
               </span>
             ) : null}
 
             <button
               type="button"
-              className="task__aim"
-              onClick={() => {
-                focusTask(task.id);
-                startTimer();
-              }}
-              title="Focus on this and start the timer"
-            >
-              aim
-            </button>
-
-            <button
-              type="button"
-              className="task__remove"
+              className="task__x"
               onClick={() => removeTask(task.id)}
               aria-label={`Remove ${task.title}`}
             >
@@ -102,10 +102,12 @@ export function TaskList() {
       </ul>
 
       {tasks.length === 0 ? (
-        <p className="tasks__empty">
+        <p className="note">
           Today only. Whatever you write here is gone tomorrow — that is the point.
         </p>
-      ) : null}
-    </aside>
+      ) : (
+        <p className="note note--quiet">Click a task to aim the timer at it.</p>
+      )}
+    </section>
   );
 }

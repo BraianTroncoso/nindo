@@ -51,7 +51,7 @@ That is the whole product. Everything else is in service of not breaking that lo
 |---|---|
 | **Timer** | 25/5 and 50/10 presets or your own numbers, long break every N sessions. Survives sleep, tab throttling and browser restarts — it tracks a deadline, not a countdown. |
 | **Today** | A list that exists for exactly one day. Aim the timer at a task, and finishing a session credits it. Tomorrow it is gone, on purpose. |
-| **Mascots** | Pluggable character packs. Naruto ships as pack #1, Ember is the original one, and you can [add yours](docs/CHARACTERS.md) with two images and zero code. Or turn the mascot off entirely. |
+| **Mascots** | Pluggable character packs. Naruto ships as pack #1 with the real sage-mode awakening played frame by frame, Ember is the original CC0 one, and you can [add yours](docs/CHARACTERS.md) with two images and zero code. Or turn the mascot off entirely. |
 | **Spotus** | Paste a YouTube link or playlist, drop your own audio files, or search if you bring an API key. A minimal queue, nothing else. |
 | **Zen mode** | `F` — the mascot and the clock, nothing else, for the second monitor. |
 | **Offline** | Installable PWA. The whole shell is precached; the timer and your list work with the network unplugged. |
@@ -123,9 +123,11 @@ PRs with new packs are the kind of PR this repo exists for.
 Code: [MIT](LICENSE).
 
 Art is licensed **per pack** — check `character.json`. The `ember` pack is CC0.
-The `naruto` pack is unofficial fan art: Naruto is © Masashi Kishimoto /
+
+The `naruto` pack is **frames from the anime**: Naruto is © Masashi Kishimoto /
 Shueisha / Pierrot, this project is not affiliated with or endorsed by them, and
-that pack is not for commercial use. See [docs/LEGAL.md](docs/LEGAL.md).
+that pack is not for commercial use. If you fork this for anything public,
+delete it and ship `ember`. See [docs/LEGAL.md](docs/LEGAL.md).
 
 <div align="center">
 

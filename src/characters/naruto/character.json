@@ -1,22 +1,23 @@
 {
   "id": "naruto",
   "name": "Naruto Uzumaki",
-  "author": "nindo contributors (original vector art)",
+  "author": "frames from the anime, assembled by LOSXinfinity/Naruto-25th-Anniversary-",
   "license": "fan-art",
-  "credits": "Naruto © Masashi Kishimoto / Shueisha / Pierrot. Unofficial fan pack, not affiliated with or endorsed by the rights holders. Not for commercial use.",
+  "credits": "Naruto © Masashi Kishimoto / Shueisha / Pierrot. Frames from Naruto Shippuden, used in an unofficial fan project. Not affiliated with or endorsed by the rights holders. Not for commercial use.",
   "theme": {
-    "bg": "#171109",
-    "accent": "#ff8a3d",
-    "glow": "#ffd27a"
+    "bg": "#0d0b09",
+    "accent": "#f2762e",
+    "glow": "#ffc266"
   },
   "poses": {
-    "idle": { "kind": "image", "src": "meditating.svg", "breathe": true },
-    "active": { "kind": "image", "src": "sage.svg" }
+    "idle": { "kind": "image", "src": "idle.webp", "breathe": true },
+    "transform": { "kind": "sequence", "src": "seq/##.webp", "frames": 24, "fps": 22 },
+    "active": { "kind": "image", "src": "active.webp" }
   },
   "transition": {
     "flash": true,
     "shake": 7,
-    "particles": 28,
-    "durationMs": 1000
+    "particles": 26,
+    "durationMs": 1100
   }
 }

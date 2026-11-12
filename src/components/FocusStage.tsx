@@ -17,20 +17,21 @@ const PHASE_LABEL: Record<Phase, string> = {
 };
 
 /**
- * Owns the clock tick so the rest of the app does not re-render four times a
- * second. Also the single place where a completed phase turns into side effects.
+ * The hero. Owns the clock tick so the rest of the app does not re-render four
+ * times a second, and is the single place where a completed phase turns into
+ * side effects.
  */
 export function FocusStage() {
   const snapshot = useNindo((s) => s.timer);
   const durations = useNindo((s) => s.settings.durations);
-  const settings = useNindo((s) => s.settings);
+  const soundEnabled = useNindo((s) => s.settings.soundEnabled);
+  const notificationsEnabled = useNindo((s) => s.settings.notificationsEnabled);
+  const mascotId = useNindo((s) => s.settings.mascot);
   const mascotState = useNindo((s) => s.mascotState);
-  const activeTaskId = useNindo((s) => s.tasks.activeTaskId);
   const activeTitle = useNindo(
     (s) => s.tasks.tasks.find((t) => t.id === s.tasks.activeTaskId)?.title ?? null,
   );
-  // Selected one by one: actions are stable, so this component only re-renders
-  // for the state it actually reads.
+
   const startTimer = useNindo((s) => s.startTimer);
   const pauseTimer = useNindo((s) => s.pauseTimer);
   const resetTimer = useNindo((s) => s.resetTimer);
@@ -42,7 +43,8 @@ export function FocusStage() {
   const running = timerCore.isRunning(snapshot);
   const remaining = timerCore.remainingMs(snapshot, now);
   const charge = timerCore.progress(snapshot, now, durations);
-  const pack = findPack(settings.mascot);
+  const full = timerCore.phaseDurationMs(snapshot.phase, durations);
+  const pack = findPack(mascotId);
 
   // Tick only while the clock is actually running.
   useEffect(() => {
@@ -58,6 +60,34 @@ export function FocusStage() {
     };
   }, [running]);
 
+  // The charge belongs to the whole room, not just the mascot: the background
+  // warms, the top rule fills, the clock catches the light. One property, read
+  // by CSS everywhere, with no extra React work.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--charge", charge.toFixed(3));
+    return () => {
+      root.style.removeProperty("--charge");
+    };
+  }, [charge]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const theme = pack?.theme;
+    const applied: string[] = [];
+    for (const [key, value] of Object.entries({
+      "--bg": theme?.bg,
+      "--accent": theme?.accent,
+      "--glow": theme?.glow,
+    })) {
+      if (value) {
+        root.style.setProperty(key, value);
+        applied.push(key);
+      }
+    }
+    return () => applied.forEach((key) => root.style.removeProperty(key));
+  }, [pack]);
+
   // Phase completion → credit the task, ring, notify, transform.
   const handled = useRef<number | null>(null);
   useEffect(() => {
@@ -67,8 +97,8 @@ export function FocusStage() {
     handled.current = snapshot.endsAt;
 
     completePhase(result.snapshot, result.completed);
-    if (settings.soundEnabled) ringBell(result.completed === "focus");
-    if (settings.notificationsEnabled) {
+    if (soundEnabled) ringBell(result.completed === "focus");
+    if (notificationsEnabled) {
       notify(
         result.completed === "focus" ? "Sage mode" : "Back to it",
         result.completed === "focus"
@@ -76,13 +106,12 @@ export function FocusStage() {
           : "Break over. Next session is ready.",
       );
     }
-  }, [snapshot, now, durations, settings.soundEnabled, settings.notificationsEnabled, completePhase]);
+  }, [snapshot, now, durations, soundEnabled, notificationsEnabled, completePhase]);
 
   // Hold the transformed pose for a beat, then let it settle.
   useEffect(() => {
     if (mascotState !== "transforming") return;
-    const ms = pack?.transition?.durationMs ?? 900;
-    const id = window.setTimeout(settleMascot, ms);
+    const id = window.setTimeout(settleMascot, pack?.transition?.durationMs ?? 900);
     return () => window.clearTimeout(id);
   }, [mascotState, pack, settleMascot]);
 
@@ -93,67 +122,53 @@ export function FocusStage() {
       : "nindo — my focus way";
   }, [running, remaining, snapshot.phase]);
 
-  const sessionDots = Array.from({ length: Math.max(1, durations.longBreakEvery) });
+  const started = remaining < full;
+  const cadence = Math.max(1, durations.longBreakEvery);
+  const clock = formatClock(remaining);
 
   return (
-    <section
-      className="stage"
-      data-mascot={pack ? "on" : "off"}
-      style={
-        {
-          "--charge": charge.toFixed(3),
-          ...(pack?.theme?.accent ? { "--accent": pack.theme.accent } : {}),
-          ...(pack?.theme?.glow ? { "--glow": pack.theme.glow } : {}),
-          ...(pack?.theme?.bg ? { "--bg": pack.theme.bg } : {}),
-        } as React.CSSProperties
-      }
-    >
+    <section className="hero" data-mascot={pack ? "on" : "off"}>
       {pack ? <MascotStage pack={pack} charge={charge} state={mascotState} /> : null}
 
       <div className="clock">
-        <p className="clock__phase">{PHASE_LABEL[snapshot.phase]}</p>
-        <p className="clock__time" aria-live="off">
-          {formatClock(remaining)}
+        <p className="clock__phase">
+          {PHASE_LABEL[snapshot.phase]}
+          {activeTitle ? <span className="clock__task"> · {activeTitle}</span> : null}
         </p>
-        <p className="clock__task">
-          {activeTitle ? (
-            <>
-              <span className="clock__task-label">on</span> {activeTitle}
-            </>
-          ) : (
-            <span className="clock__task-empty">
-              {activeTaskId ? "" : "pick a task to aim at"}
-            </span>
-          )}
+
+        <p className="clock__time">
+          <span>{clock.split(":")[0]}</span>
+          <i aria-hidden>:</i>
+          <span>{clock.split(":")[1]}</span>
         </p>
       </div>
 
       <div className="controls">
-        <button
-          type="button"
-          className="btn btn--primary"
-          onClick={running ? pauseTimer : startTimer}
-        >
-          {running ? "Pause" : remaining < timerCore.phaseDurationMs(snapshot.phase, durations) ? "Resume" : "Start"}
+        <button type="button" className="go" onClick={running ? pauseTimer : startTimer}>
+          {running ? "Pause" : started ? "Resume" : "Start"}
         </button>
-        <button type="button" className="btn" onClick={resetTimer} title="Reset this phase (R)">
-          Reset
+        <button type="button" className="tool" onClick={resetTimer} title="Reset this phase (R)">
+          reset
         </button>
-        <button type="button" className="btn" onClick={skipPhase} title="Skip to the next phase (S)">
-          Skip
+        <button type="button" className="tool" onClick={skipPhase} title="Skip to the next phase (S)">
+          skip
         </button>
       </div>
 
-      <div className="cycle" title={`Long break every ${durations.longBreakEvery} sessions`}>
-        {sessionDots.map((_, i) => (
+      <p className="cadence" title={`Long break every ${cadence} sessions`}>
+        {Array.from({ length: cadence }, (_, i) => (
           <span
             key={i}
-            className="cycle__dot"
-            data-done={i < snapshot.completedFocus % Math.max(1, durations.longBreakEvery) ? "" : undefined}
+            className="cadence__dot"
+            data-done={i < snapshot.completedFocus % cadence ? "" : undefined}
           />
         ))}
-        <span className="cycle__count">{snapshot.completedFocus} today</span>
-      </div>
+        <span className="cadence__count">
+          {snapshot.completedFocus === 0
+            ? "no sessions yet"
+            : `${snapshot.completedFocus} done today`}
+        </span>
+      </p>
     </section>
   );
 }

@@ -4,15 +4,19 @@
  * API of this project, so keep it boring and stable.
  */
 
-export type PoseKind = "image" | "sprite";
+export type PoseKind = "image" | "sprite" | "sequence";
 
 export type Pose = {
   kind: PoseKind;
-  /** Path under /characters/<id>/ — any format the browser renders (svg, png, webp, gif). */
+  /**
+   * Path under /characters/<id>/.
+   * For `sequence`, `##` is replaced by the 1-based frame number, zero padded to
+   * the width of the placeholder — e.g. "seq/##.webp" → "seq/01.webp".
+   */
   src: string;
   /** Gentle breathing loop. Leave off for poses that already animate themselves. */
   breathe?: boolean;
-  /** Sprite sheets only: horizontal frame count and playback rate. */
+  /** Frame count for `sprite` (one horizontal strip) and `sequence` (separate files). */
   frames?: number;
   fps?: number;
 };
@@ -32,6 +36,11 @@ export type CharacterPack = {
     idle: Pose;
     /** Reached when the focus session completes — the transformed pose. */
     active: Pose;
+    /**
+     * Optional: played once, between idle and active, when the session
+     * completes. Packs without it get the crossfade, which is plenty.
+     */
+    transform?: Pose;
   };
   transition?: {
     flash?: boolean;
@@ -76,4 +85,15 @@ function isPose(value: unknown): value is Pose {
 
 export function poseUrl(packId: string, pose: Pose): string {
   return `/characters/${packId}/${pose.src}`;
+}
+
+/** Expands a `sequence` pose into one URL per frame. */
+export function sequenceUrls(packId: string, pose: Pose): string[] {
+  const count = pose.frames ?? 0;
+  const match = pose.src.match(/#+/);
+  if (count < 1 || !match) return [];
+  const pad = match[0].length;
+  return Array.from({ length: count }, (_, i) =>
+    `/characters/${packId}/${pose.src.replace(/#+/, `${i + 1}`.padStart(pad, "0"))}`,
+  );
 }
