@@ -39,6 +39,34 @@ uploader's setting.
 YouTube Data API v3 key. It is stored in your browser, spends **your** quota
 (10,000 units/day ≈ 100 searches), and is sent only to `googleapis.com`.
 
+## How the queue behaves
+
+Paste as many links as you like. They line up — a new paste never interrupts
+what is already playing. The only time an addition takes over is when nothing
+is playing at all, or when you pick a search result, which is an explicit choice.
+
+```
+  paste · paste · paste        ▸ a   b   c
+  a ends                       ▸ b   c        (a is dropped)
+  b ends                       ▸ c
+  c ends, nothing left         ▸ RDc           YouTube's mix for c
+```
+
+A track that plays to its end is **consumed**: it leaves the queue, because a
+list of things you have already heard is clutter. Skipping by hand is different
+— `‹‹` and `››` only move the cursor, so you can go back.
+
+When the last track ends, playback continues into **YouTube's own mix** for it
+(the `RD<videoId>` radio, the same queue the site would have built), tagged
+`radio` in the list so you can tell it apart from what you chose. The music does
+not stop in the middle of a session unless you stop it.
+
+Pasting an `RD…` link directly is recognised as a radio too, rather than being
+treated as a curated playlist.
+
+The queue logic lives in `src/features/spotus/queue.ts` as plain functions over
+plain data, so all of the above is unit-tested without waiting out a song.
+
 ## Why search needs your key
 
 Short version: nindo has no server, so it has no place to keep a secret. The

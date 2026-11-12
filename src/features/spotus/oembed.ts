@@ -31,7 +31,14 @@ export async function trackFromInput(input: string, signal?: AbortSignal): Promi
   const parsed = parseYouTube(input);
   if (!parsed) return null;
 
-  const source = parsed.kind === "playlist" ? "youtube-playlist" : "youtube";
+  // An `RD…` list is one of YouTube's auto-generated radios, not a playlist
+  // somebody curated — worth saying so, since it never ends.
+  const source =
+    parsed.kind !== "playlist"
+      ? "youtube"
+      : parsed.id.startsWith("RD")
+        ? "youtube-mix"
+        : "youtube-playlist";
   const canonical =
     parsed.kind === "playlist"
       ? `https://www.youtube.com/playlist?list=${parsed.id}`
@@ -40,7 +47,12 @@ export async function trackFromInput(input: string, signal?: AbortSignal): Promi
   const fallback: Track = {
     id: parsed.id,
     source,
-    title: parsed.kind === "playlist" ? "YouTube playlist" : parsed.id,
+    title:
+      source === "youtube-mix"
+        ? "YouTube mix"
+        : parsed.kind === "playlist"
+          ? "YouTube playlist"
+          : parsed.id,
   };
 
   try {

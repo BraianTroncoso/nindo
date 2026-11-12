@@ -1,4 +1,9 @@
-export type TrackSource = "youtube" | "youtube-playlist";
+export type TrackSource =
+  | "youtube"
+  /** A playlist the user pasted. */
+  | "youtube-playlist"
+  /** YouTube's own radio for a video — the `RD<videoId>` mix. */
+  | "youtube-mix";
 
 export type Track = {
   /** YouTube video or playlist id. */

@@ -52,7 +52,7 @@ That is the whole product. Everything else is in service of not breaking that lo
 | **Timer** | 25/5 and 50/10 presets or your own numbers, long break every N sessions. Survives sleep, tab throttling and browser restarts — it tracks a deadline, not a countdown. |
 | **Today** | A list that exists for exactly one day. Aim the timer at a task, and finishing a session credits it. Tomorrow it is gone, on purpose. |
 | **Mascots** | Pluggable character packs. Naruto ships as pack #1 with the real sage-mode awakening played frame by frame, Ember is the original CC0 one, and you can [add yours](docs/CHARACTERS.md) with two images and zero code. Or turn the mascot off entirely. |
-| **Spotus** | Paste a YouTube link or playlist, or search if you bring an API key. A minimal queue, nothing else. |
+| **Spotus** | Paste as many YouTube links as you like — they queue up without interrupting, each one is dropped once it finishes, and when the last ends YouTube's own mix keeps the music going. Search too, if you bring an API key. |
 | **Room tone** | Seven dim palettes to pick the background you will stare at all day, or `auto` to let the mascot choose. |
 | **Zen mode** | `F` — the mascot, the clock, and the track that is playing. Nothing else. Move the mouse and the controls come back. |
 | **Offline** | Installable PWA. The whole shell is precached; the timer and your list work with the network unplugged. |

@@ -10,6 +10,7 @@ import { DEFAULT_DURATIONS, type Durations, type Phase, type TimerSnapshot } fro
 import * as tasks from "@/features/tasks/core";
 import type { TasksState } from "@/features/tasks/core";
 import type { Track } from "@/features/spotus/types";
+import * as queue from "@/features/spotus/queue";
 
 export type Settings = {
   durations: Durations;
@@ -63,6 +64,8 @@ type NindoState = {
   playTrack: (id: string) => void;
   setPlaying: (playing: boolean) => void;
   playNext: (direction?: 1 | -1) => void;
+  /** A track played to its end: consume it and move on. */
+  finishTrack: () => void;
 
   // settings
   updateSettings: (patch: Partial<Settings>) => void;
@@ -103,7 +106,7 @@ const newId = () =>
 
 export const useNindo = create<NindoState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       settings: DEFAULT_SETTINGS,
       timer: timer.idleSnapshot("focus", DEFAULT_DURATIONS),
       tasks: tasks.emptyTasks(),
@@ -137,42 +140,12 @@ export const useNindo = create<NindoState>()(
       focusTask: (id) => set((s) => ({ tasks: tasks.setActiveTask(s.tasks, id) })),
       rollDay: () => set((s) => ({ tasks: tasks.rollToDay(s.tasks) })),
 
-      addTrack: (track) =>
-        set((s) => {
-          if (s.spotus.playlist.some((t) => t.id === track.id)) return s;
-          const playlist = [...s.spotus.playlist, track];
-          return {
-            spotus: {
-              ...s.spotus,
-              playlist,
-              currentId: s.spotus.currentId ?? track.id,
-            },
-          };
-        }),
-
-      removeTrack: (id) =>
-        set((s) => {
-          const playlist = s.spotus.playlist.filter((t) => t.id !== id);
-          const wasCurrent = s.spotus.currentId === id;
-          return {
-            spotus: {
-              playlist,
-              currentId: wasCurrent ? (playlist[0]?.id ?? null) : s.spotus.currentId,
-              playing: wasCurrent ? false : s.spotus.playing,
-            },
-          };
-        }),
-
-      playTrack: (id) => set((s) => ({ spotus: { ...s.spotus, currentId: id, playing: true } })),
+      addTrack: (track) => set((s) => ({ spotus: queue.enqueue(s.spotus, track) })),
+      removeTrack: (id) => set((s) => ({ spotus: queue.remove(s.spotus, id) })),
+      playTrack: (id) => set((s) => ({ spotus: queue.select(s.spotus, id) })),
       setPlaying: (playing) => set((s) => ({ spotus: { ...s.spotus, playing } })),
-
-      playNext: (direction = 1) => {
-        const { playlist, currentId } = get().spotus;
-        if (playlist.length === 0) return;
-        const index = playlist.findIndex((t) => t.id === currentId);
-        const next = playlist[(index + direction + playlist.length) % playlist.length];
-        set((s) => ({ spotus: { ...s.spotus, currentId: next.id, playing: true } }));
-      },
+      playNext: (direction = 1) => set((s) => ({ spotus: queue.step(s.spotus, direction) })),
+      finishTrack: () => set((s) => ({ spotus: queue.finish(s.spotus) })),
 
       updateSettings: (patch) =>
         set((s) => {

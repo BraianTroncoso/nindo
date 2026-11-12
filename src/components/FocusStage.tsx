@@ -137,6 +137,7 @@ export function FocusStage() {
       {zenShowTrack && nowPlaying ? (
         <p className="stage__track" title={nowPlaying.title}>
           <span className="stage__track-dot" aria-hidden />
+          {nowPlaying.source === "youtube-mix" ? <span className="tag">radio</span> : null}
           {nowPlaying.title}
         </p>
       ) : null}

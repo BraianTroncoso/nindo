@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { embedUrl, parseYouTube } from "./parse";
+import { parseYouTube } from "./parse";
 
 describe("parseYouTube", () => {
   it("reads standard watch URLs", () => {
@@ -61,19 +61,5 @@ describe("parseYouTube", () => {
 
   it("is not fooled by a lookalike host", () => {
     expect(parseYouTube("https://youtube.com.attacker.net/watch?v=jfKfPfyJRdk")).toBe(null);
-  });
-});
-
-describe("embedUrl", () => {
-  it("builds a privacy-friendly video embed with the JS API enabled", () => {
-    const url = embedUrl({ id: "jfKfPfyJRdk", source: "youtube" }, "https://nindo.vercel.app");
-    expect(url).toContain("youtube-nocookie.com/embed/jfKfPfyJRdk");
-    expect(url).toContain("enablejsapi=1");
-    expect(url).toContain("origin=https%3A%2F%2Fnindo.vercel.app");
-  });
-
-  it("builds a videoseries embed for playlists", () => {
-    const url = embedUrl({ id: "PLx0sYbCqObp7", source: "youtube-playlist" });
-    expect(url).toContain("/embed/videoseries?list=PLx0sYbCqObp7");
   });
 });

@@ -61,18 +61,3 @@ export function parseYouTube(input: string): ParsedYouTube {
 
   return null;
 }
-
-export function embedUrl(track: { id: string; source: string }, origin?: string): string {
-  const base = "https://www.youtube-nocookie.com/embed";
-  const params = new URLSearchParams({
-    enablejsapi: "1",
-    rel: "0",
-    modestbranding: "1",
-    playsinline: "1",
-  });
-  if (origin) params.set("origin", origin);
-
-  return track.source === "youtube-playlist"
-    ? `${base}/videoseries?list=${encodeURIComponent(track.id)}&${params}`
-    : `${base}/${encodeURIComponent(track.id)}?${params}`;
-}

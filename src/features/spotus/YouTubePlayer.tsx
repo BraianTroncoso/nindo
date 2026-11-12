@@ -162,7 +162,9 @@ export function YouTubePlayer({
 
 function queue(player: YTPlayer | null, track: Track, playing: boolean) {
   if (!player) return;
-  if (track.source === "youtube-playlist") {
+  // A pasted playlist and a YouTube mix are both playlists to the player; only
+  // a single video is loaded by id.
+  if (track.source !== "youtube") {
     player.loadPlaylist({ list: track.id, listType: "playlist" });
     if (!playing) player.pauseVideo();
     return;

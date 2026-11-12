@@ -21,6 +21,7 @@ export function SpotusBar() {
   const playTrack = useNindo((s) => s.playTrack);
   const setPlaying = useNindo((s) => s.setPlaying);
   const playNext = useNindo((s) => s.playNext);
+  const finishTrack = useNindo((s) => s.finishTrack);
   const updateSettings = useNindo((s) => s.updateSettings);
 
   const [mode, setMode] = useState<Mode>("paste");
@@ -44,8 +45,8 @@ export function SpotusBar() {
         if (!track) {
           setMessage("That is not a YouTube link. Paste a video or playlist URL.");
         } else {
+          // Queued, not forced: enqueue() only takes over when nothing plays.
           addTrack(track);
-          playTrack(track.id);
           setDraft("");
         }
       } else {
@@ -174,11 +175,14 @@ export function SpotusBar() {
                 playing={playing}
                 volume={volume}
                 onPlayingChange={setPlaying}
-                onEnded={() => playNext(1)}
+                onEnded={finishTrack}
                 onError={setMessage}
               />
             ) : (
-              <p className="player__empty">Paste a YouTube link to start.</p>
+              <p className="player__empty">
+                Paste a YouTube link to start. Add as many as you like — they queue up,
+                and when the last one ends YouTube&rsquo;s own mix keeps going.
+              </p>
             )}
           </div>
 
@@ -186,8 +190,13 @@ export function SpotusBar() {
             {playlist.map((track) => (
               <li key={track.id} className="queue__item" data-on={track.id === currentId ? "" : undefined}>
                 <button type="button" className="queue__play" onClick={() => playTrack(track.id)}>
-                  <span className="spotus__title">{track.title}</span>
-                  <span className="spotus__author">{track.author ?? track.source}</span>
+                  <span className="spotus__title">
+                    {track.source === "youtube-mix" ? (
+                      <span className="tag">radio</span>
+                    ) : null}
+                    {track.title}
+                  </span>
+                  <span className="spotus__author">{track.author ?? "youtube"}</span>
                 </button>
                 <button
                   type="button"

@@ -389,3 +389,53 @@ test("zen leaves only the mascot, the clock and what is playing", async ({ page 
 
   await page.screenshot({ path: "e2e/.artifacts/13-zen.png" });
 });
+
+test("pasting queues without cutting the music off", async ({ page }) => {
+  await page.goto("/");
+
+  // Each paste costs a round trip to oEmbed, so wait for the row to land rather
+  // than racing the next click.
+  const paste = async (id: string, expected: number) => {
+    await page.getByLabel("YouTube URL").fill(`https://www.youtube.com/watch?v=${id}`);
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(page.locator(".queue__item")).toHaveCount(expected, { timeout: 15_000 });
+  };
+
+  await paste("lTRiuFIWV54", 1);
+  const first = await page.locator(".queue__item[data-on] .spotus__title").textContent();
+
+  await paste("jfKfPfyJRdk", 2);
+  await paste("5qap5aO4i9A", 3);
+
+  // The first one is still the one playing: adding lines things up, it does not
+  // hijack the speakers.
+  await expect(page.locator(".queue__item[data-on] .spotus__title")).toHaveText(first ?? "");
+  await page.screenshot({ path: "e2e/.artifacts/15-queue.png" });
+});
+
+test("a YouTube mix is recognised as a radio, not a playlist", async ({ page }) => {
+  await page.goto("/");
+
+  // Consuming a queue to its end and handing over to the mix is covered by the
+  // unit tests, which can do it without waiting out a real song. What the
+  // browser has to prove is the other half: that a mix is told apart, labelled,
+  // and handed to the player as a playlist rather than a video id.
+  await page
+    .getByLabel("YouTube URL")
+    .fill("https://www.youtube.com/playlist?list=RDlTRiuFIWV54");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+
+  await expect(page.locator(".queue__item")).toHaveCount(1, { timeout: 15_000 });
+  await expect(page.locator(".queue__item .tag")).toHaveText("radio");
+  // The zen line names it too, so you are not left guessing in fullscreen.
+  await expect(page.locator(".stage__track .tag")).toHaveText("radio");
+
+  // The player is created empty and the mix is pushed in through the JS API, so
+  // the iframe src proves nothing. What proves it is the frame filling with a
+  // track nobody queued — YouTube choosing the next song.
+  await expect(page.locator(".spotus__message")).toHaveCount(0);
+  const frame = page.frameLocator(".player__frame iframe");
+  await expect(frame.locator("body")).not.toBeEmpty({ timeout: 20_000 });
+
+  await page.screenshot({ path: "e2e/.artifacts/16-radio.png" });
+});

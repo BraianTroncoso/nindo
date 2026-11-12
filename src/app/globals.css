@@ -785,6 +785,20 @@ body::before {
   background: linear-gradient(135deg, #171109 0 50%, #0a0e15 50% 100%);
 }
 
+/* Marks a row that is YouTube's own mix rather than something you queued. */
+.tag {
+  display: inline-block;
+  margin-right: 0.4rem;
+  padding: 0.05rem 0.3rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 4px;
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  vertical-align: 0.08em;
+}
+
 /* ── settings sheet ──────────────────────────────────────────────────────── */
 
 .sheet {
