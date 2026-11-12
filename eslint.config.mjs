@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vercel CLI build output: minified vendor code, not ours to lint.
+    ".vercel/**",
+    "e2e/.artifacts/**",
   ]),
 ]);
 

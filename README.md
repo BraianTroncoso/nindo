@@ -65,10 +65,16 @@ That is the whole product. Everything else is in service of not breaking that lo
 
 ## Install it
 
-Use the hosted build, then install it from the address bar (`⊕` icon in
-Chrome/Edge, *Share → Add to Dock* in Safari). It then runs in its own window.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FBraianTroncoso%2Fnindo&project-name=nindo&repository-name=nindo)
 
-Or run your own:
+One click gives you your own copy on Vercel's free tier. There is nothing to
+configure: no environment variables, no database, no server to pay for.
+
+Once it is open, **install it as an app** from the address bar (the `⊕` icon in
+Chrome and Edge, *Share → Add to Dock* in Safari). It then runs in its own
+window, keeps working offline, and shows the countdown in your taskbar.
+
+Or run it locally:
 
 ```bash
 git clone https://github.com/BraianTroncoso/nindo
