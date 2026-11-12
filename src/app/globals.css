@@ -113,7 +113,13 @@ body::before {
   grid-template-columns: minmax(200px, 270px) 1fr;
   gap: 1.5rem;
   min-height: 0;
-  align-items: center;
+  /* The task list is a rail and should run the full height; only the stage is
+     centred. On a wide monitor a half-height floating card reads lopsided. */
+  align-items: stretch;
+}
+
+.layout > .stage {
+  align-self: center;
 }
 
 .layout:has(.stage:only-child) {
@@ -689,9 +695,14 @@ body::before {
 }
 
 .player {
+  display: grid;
+  border: 1px solid var(--panel-line);
   border-radius: 10px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.35);
+  /* Without a video the box would collapse to one line of text and float; the
+     empty state should hold the same shape the player will take. */
+  min-height: 92px;
 }
 
 .player__frame {
@@ -710,6 +721,9 @@ body::before {
 }
 
 .player__empty {
+  display: grid;
+  place-content: center;
+  text-align: center;
   margin: 0;
   padding: 0.9rem;
   font-size: 0.76rem;

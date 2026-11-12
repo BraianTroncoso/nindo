@@ -17,6 +17,13 @@ npm run lint
 have one: `npx playwright install chromium` and drop `channel: "chrome"` from
 `playwright.config.ts`.
 
+**If the app renders as naked HTML** — readable text, no panels, no layout —
+the dev server is serving a stale stylesheet. Turbopack's persistent cache keeps
+the CSS chunk under a stable filename, so after a large change to `globals.css`
+(or a `git checkout` of it) the old bytes can outlive a reload. Stop the server,
+`rm -rf .next`, start it again. The `stylesheet is actually applied` smoke test
+exists to catch the same failure in a build.
+
 ## Before you open a PR
 
 ```bash

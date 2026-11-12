@@ -276,3 +276,39 @@ test("the layout holds up from a wide monitor down to a phone", async ({ page })
     await page.screenshot({ path: `e2e/.artifacts/11-${name}.png`, fullPage: width < 1000 });
   }
 });
+
+test("the stylesheet is actually applied, not merely downloaded", async ({ page }) => {
+  await page.goto("/");
+
+  // A stale bundler cache once served the stylesheet of a different layout:
+  // every file was 200 OK, the CSS parsed, and the app still rendered as naked
+  // HTML because none of its selectors matched the markup. Checking computed
+  // style on one element per region is what catches that.
+  const probe = await page.evaluate(() => {
+    const style = (selector: string, property: string) => {
+      const el = document.querySelector(selector);
+      if (!el) return "MISSING";
+      return getComputedStyle(el).getPropertyValue(property);
+    };
+    return {
+      layout: style(".layout", "display"),
+      shell: style(".shell", "display"),
+      tasksRadius: style(".tasks", "border-top-left-radius"),
+      tasksBorder: style(".tasks", "border-top-width"),
+      spotusRadius: style(".spotus", "border-top-left-radius"),
+      buttonBorder: style(".btn", "border-top-width"),
+      inputRadius: style(".input", "border-top-left-radius"),
+      mascotRadius: style(".mascot__poses", "border-top-left-radius"),
+    };
+  });
+
+  expect(probe.layout).toBe("grid");
+  expect(probe.shell).toBe("grid");
+  expect(probe.tasksBorder).toBe("1px");
+  expect(probe.buttonBorder).toBe("1px");
+  for (const key of ["tasksRadius", "spotusRadius", "inputRadius", "mascotRadius"] as const) {
+    expect(probe[key], `${key} has no radius — the stylesheet did not match the markup`).not.toBe(
+      "0px",
+    );
+  }
+});
