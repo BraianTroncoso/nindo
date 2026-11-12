@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 import { DEFAULT_MASCOT, type MascotChoice } from "@/characters/registry";
 import { FOLLOW_MASCOT, type PaletteChoice } from "@/features/theme/palettes";
 import type { MascotState } from "@/features/mascot/types";
@@ -11,6 +11,7 @@ import * as tasks from "@/features/tasks/core";
 import type { TasksState } from "@/features/tasks/core";
 import type { Track } from "@/features/spotus/types";
 import * as queue from "@/features/spotus/queue";
+import { safeDurations, safeQueue, safeStorage, safeTasks, safeTimer } from "./hydrate";
 
 export type Settings = {
   durations: Durations;
@@ -27,6 +28,14 @@ export type Settings = {
   showPlayer: boolean;
   /** 0 → 1. */
   volume: number;
+};
+
+/** Exactly the slices that reach storage; see `partialize` below. */
+type NindoPersisted = {
+  settings: Settings;
+  timer: TimerSnapshot;
+  tasks: TasksState;
+  spotus: SpotusState;
 };
 
 export type SpotusState = {
@@ -83,21 +92,6 @@ const DEFAULT_SETTINGS: Settings = {
   showPlayer: true,
   volume: 0.7,
 };
-
-/**
- * During the static prerender there is no localStorage. Handing zustand an
- * undefined storage makes it skip the persist middleware entirely, which strips
- * `useNindo.persist` off the store and crashes the build — so give it a no-op
- * on the server and the real thing in the browser.
- */
-const inertStorage: StateStorage = {
-  getItem: () => null,
-  setItem: () => undefined,
-  removeItem: () => undefined,
-};
-
-const browserStorage = () =>
-  typeof window === "undefined" ? inertStorage : window.localStorage;
 
 const newId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -164,7 +158,7 @@ export const useNindo = create<NindoState>()(
       name: "nindo",
       version: 1,
       skipHydration: true,
-      storage: createJSONStorage(browserStorage),
+      storage: safeStorage<NindoPersisted>(),
       partialize: (state) => ({
         settings: state.settings,
         timer: state.timer,
@@ -175,16 +169,28 @@ export const useNindo = create<NindoState>()(
           playing: false,
         },
       }),
+      /**
+       * Everything read back is untrusted. It may come from an older version,
+       * a crashed write, or a hand-edited entry, and a single wrong field used
+       * to crash the first render — which looks exactly like a broken app.
+       * Each slice is checked and repaired instead.
+       */
       merge: (persisted, current) => {
-        const saved = persisted as Partial<NindoState> | undefined;
-        if (!saved) return current;
+        const saved = persisted as Record<string, unknown> | undefined;
+        if (!saved || typeof saved !== "object") return current;
+
+        const savedSettings = (
+          typeof saved.settings === "object" && saved.settings !== null ? saved.settings : {}
+        ) as Partial<Settings>;
+        const durations = safeDurations(savedSettings.durations);
+
         return {
           ...current,
-          ...saved,
-          settings: { ...current.settings, ...saved.settings },
+          settings: { ...current.settings, ...savedSettings, durations },
+          timer: safeTimer(saved.timer, durations),
           // A day boundary crossed while the tab was closed clears the list.
-          tasks: tasks.rollToDay(saved.tasks ?? current.tasks),
-          spotus: { ...current.spotus, ...saved.spotus, playing: false },
+          tasks: safeTasks(saved.tasks),
+          spotus: safeQueue(saved.spotus),
           mascotState: "idle",
         };
       },

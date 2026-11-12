@@ -75,9 +75,16 @@ One zustand store with the `persist` middleware, key `nindo`, version 1.
 
 Hydration is manual (`skipHydration: true`) and the app renders a boot screen
 until it finishes, so the prerendered HTML and the first client render always
-agree. There is also an inert storage shim for the prerender pass — handing
-zustand an undefined storage makes it drop the `persist` API entirely and the
-static export fails.
+agree.
+
+**Nothing read back from storage is trusted.** `store/hydrate.ts` holds a
+storage wrapper that swallows its own failures, plus a repair function per
+slice. Three real browsers break the naive version: Safari in private mode and
+any browser with site data blocked throw on every `localStorage` call, and an
+entry truncated by a crash makes `JSON.parse` throw. Each used to reject the
+hydration promise and leave the app on its loading screen forever. A saved file
+with one wrong field used to crash the first render, which looks identical to a
+broken app. Losing persistence is a small thing; losing the app is not.
 
 ## The service worker
 
@@ -99,6 +106,12 @@ are never touched** — YouTube must stay live.
 |---|---|
 | `npm test` | the pure cores: pause/resume, sleep recovery, long-break cadence, day rollover, every YouTube URL shape, lookalike-host rejection |
 | `npm run smoke` | the real `out/` build in Chrome: boot without console errors, aim a task, a full transformation, pack switching, mascot off, paste-a-link against the live oEmbed endpoint, zen mode, day wipe, offline reload |
+
+`e2e/hostile.spec.ts` is the other half: corrupted storage, storage that throws,
+a saved state from an older version, a 400-character task, a hostile oEmbed
+response trying to inject markup, the network pulled out mid-paste, and someone
+leaning on the keyboard. It exists because the first time it ran, three of those
+left a permanently blank screen.
 
 The smoke suite writes screenshots to `e2e/.artifacts/`, which is the fastest way
 to review a visual change.

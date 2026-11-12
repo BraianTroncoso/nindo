@@ -15,7 +15,9 @@ export function App() {
   const [hydrated, setHydrated] = useState(() => useNindo.persist.hasHydrated());
   useEffect(() => {
     const done = useNindo.persist.onFinishHydration(() => setHydrated(true));
-    void useNindo.persist.rehydrate();
+    // If reading storage fails outright the app still has to open. Showing the
+    // boot screen forever is the worst possible answer to a bad saved file.
+    Promise.resolve(useNindo.persist.rehydrate()).catch(() => setHydrated(true));
     return done;
   }, []);
 
