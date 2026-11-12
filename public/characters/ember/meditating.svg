@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="Hooded figure meditating">
+  <title>Ember — meditating</title>
+  <defs>
+    <linearGradient id="e-robe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a3a2c"/>
+      <stop offset="1" stop-color="#2a2019"/>
+    </linearGradient>
+    <radialGradient id="e-core" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffe0a8"/>
+      <stop offset="1" stop-color="#e8a24a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="120" cy="206" rx="58" ry="9" fill="#000" opacity=".25"/>
+
+  <!-- folded legs -->
+  <path d="M64 196c0-20 25-28 56-28s56 8 56 28c0 9-18 13-56 13s-56-4-56-13z" fill="url(#e-robe)"/>
+  <!-- robe body -->
+  <path d="M90 174c-2-30 6-46 30-46s32 16 30 46z" fill="url(#e-robe)"/>
+  <!-- sleeves meeting at the lap -->
+  <path d="M94 142c-10 10-13 24-6 33 4 5 12 7 18 5" fill="none" stroke="#3b2e23" stroke-width="15" stroke-linecap="round"/>
+  <path d="M146 142c10 10 13 24 6 33-4 5-12 7-18 5" fill="none" stroke="#3b2e23" stroke-width="15" stroke-linecap="round"/>
+
+  <!-- the ember held in the hands -->
+  <circle cx="120" cy="178" r="16" fill="url(#e-core)"/>
+  <circle cx="120" cy="178" r="5" fill="#ffd27a"/>
+
+  <!-- hood -->
+  <path d="M120 60c-22 0-36 16-36 38 0 14 7 26 18 32h36c11-6 18-18 18-32 0-22-14-38-36-38z" fill="#54412f"/>
+  <path d="M120 60c-22 0-36 16-36 38 0 6 1 11 4 16 2-20 14-34 32-34s30 14 32 34c3-5 4-10 4-16 0-22-14-38-36-38z" fill="#fff" opacity=".12"/>
+  <!-- shadowed face with two calm embers for eyes -->
+  <path d="M98 100c0-12 10-20 22-20s22 8 22 20c0 14-10 26-22 26s-22-12-22-26z" fill="#1b1410"/>
+  <path d="M108 104c3-2 7-2 10 0" fill="none" stroke="#e8a24a" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M124 104c3-2 7-2 10 0" fill="none" stroke="#e8a24a" stroke-width="2.6" stroke-linecap="round"/>
+</svg>

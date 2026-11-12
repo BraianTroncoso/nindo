@@ -1,0 +1,22 @@
+{
+  "id": "your-mascot-id",
+  "name": "Your Mascot",
+  "author": "your name or handle",
+  "license": "CC0-1.0",
+  "credits": "Where the art comes from. Required if the license is \"fan-art\".",
+  "theme": {
+    "bg": "#15110c",
+    "accent": "#e8a24a",
+    "glow": "#ffe0a8"
+  },
+  "poses": {
+    "idle": { "kind": "image", "src": "idle.svg", "breathe": true },
+    "active": { "kind": "image", "src": "active.svg" }
+  },
+  "transition": {
+    "flash": true,
+    "shake": 5,
+    "particles": 22,
+    "durationMs": 900
+  }
+}

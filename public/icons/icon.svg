@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="nindo">
+  <defs>
+    <radialGradient id="i-glow" cx=".5" cy=".46" r=".52">
+      <stop offset="0" stop-color="#ff9d47"/>
+      <stop offset=".55" stop-color="#8a3f10"/>
+      <stop offset="1" stop-color="#171109"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#171109"/>
+  <circle cx="256" cy="236" r="150" fill="url(#i-glow)" opacity=".55"/>
+  <circle cx="256" cy="236" r="118" fill="none" stroke="#ffd27a" stroke-width="5" opacity=".65"/>
+  <text x="256" y="300" text-anchor="middle" font-family="serif" font-size="196" font-weight="700" fill="#ffe3b0">忍</text>
+</svg>

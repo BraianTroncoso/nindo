@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="Hooded figure standing, awakened, wreathed in light">
+  <title>Ember — awakened</title>
+  <defs>
+    <linearGradient id="a-robe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a4733"/>
+      <stop offset="1" stop-color="#2e2318"/>
+    </linearGradient>
+    <radialGradient id="a-halo" cx=".5" cy=".5" r=".5">
+      <stop offset=".55" stop-color="#ffe0a8" stop-opacity="0"/>
+      <stop offset=".85" stop-color="#ffd27a" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#e8a24a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="120" cy="118" r="98" fill="url(#a-halo)"/>
+  <ellipse cx="120" cy="224" rx="40" ry="7" fill="#000" opacity=".28"/>
+
+  <!-- robe, falling straight now -->
+  <path d="M96 222c-8-56-6-92 24-92s32 36 24 92z" fill="url(#a-robe)"/>
+  <path d="M120 130v92" stroke="#1f1811" stroke-width="2" opacity=".5"/>
+  <!-- arms open, palms out -->
+  <path d="M98 142c-14 8-22 22-22 36" fill="none" stroke="#4a3a2c" stroke-width="15" stroke-linecap="round"/>
+  <path d="M142 142c14 8 22 22 22 36" fill="none" stroke="#4a3a2c" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="74" cy="184" r="9" fill="#ffd27a" opacity=".9"/>
+  <circle cx="166" cy="184" r="9" fill="#ffd27a" opacity=".9"/>
+
+  <!-- hood thrown back, light where the face was -->
+  <path d="M120 54c-24 0-38 18-38 42 0 15 8 28 20 34h36c12-6 20-19 20-34 0-24-14-42-38-42z" fill="#624d38"/>
+  <path d="M100 98c0-12 9-20 20-20s20 8 20 20c0 14-9 26-20 26s-20-12-20-26z" fill="#2a1f16"/>
+  <circle cx="113" cy="100" r="3.4" fill="#fff3d6"/>
+  <circle cx="129" cy="100" r="3.4" fill="#fff3d6"/>
+  <path d="M113 112h16" stroke="#ffd27a" stroke-width="2.4" stroke-linecap="round" opacity=".85"/>
+
+  <!-- rising sparks -->
+  <g fill="#ffd27a">
+    <circle cx="84" cy="128" r="2.6" opacity=".8"/>
+    <circle cx="158" cy="116" r="2.2" opacity=".7"/>
+    <circle cx="96" cy="92" r="2" opacity=".6"/>
+    <circle cx="148" cy="80" r="2.4" opacity=".75"/>
+    <circle cx="120" cy="40" r="2.2" opacity=".6"/>
+  </g>
+</svg>

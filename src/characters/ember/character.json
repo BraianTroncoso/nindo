@@ -1,0 +1,22 @@
+{
+  "id": "ember",
+  "name": "Ember",
+  "author": "nindo",
+  "license": "CC0-1.0",
+  "credits": "Original art, public domain. Use it, fork it, repaint it.",
+  "theme": {
+    "bg": "#15110c",
+    "accent": "#e8a24a",
+    "glow": "#ffe0a8"
+  },
+  "poses": {
+    "idle": { "kind": "image", "src": "meditating.svg", "breathe": true },
+    "active": { "kind": "image", "src": "awakened.svg" }
+  },
+  "transition": {
+    "flash": true,
+    "shake": 4,
+    "particles": 20,
+    "durationMs": 900
+  }
+}

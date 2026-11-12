@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="Ninja sitting in lotus pose, eyes closed, gathering energy">
+  <title>Meditating</title>
+  <defs>
+    <linearGradient id="n-hair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe066"/>
+      <stop offset="1" stop-color="#f2b331"/>
+    </linearGradient>
+    <linearGradient id="n-coat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f98c2a"/>
+      <stop offset="1" stop-color="#dc6a10"/>
+    </linearGradient>
+    <linearGradient id="n-pants" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ef7f1d"/>
+      <stop offset="1" stop-color="#c85c0c"/>
+    </linearGradient>
+    <linearGradient id="n-plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7dee7"/>
+      <stop offset="1" stop-color="#97a2b0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ground contact -->
+  <ellipse cx="120" cy="209" rx="62" ry="9" fill="#000" opacity=".22"/>
+
+  <!-- crossed legs -->
+  <path d="M63 197c0-21 25-30 57-30s57 9 57 30c0 10-19 14-57 14s-57-4-57-14z" fill="url(#n-pants)"/>
+  <path d="M63 197c0 10 19 14 57 14s57-4 57-14c0-5-5-8-13-10-9 7-26 10-44 10s-35-3-44-10c-8 2-13 5-13 10z" fill="#b4510a" opacity=".55"/>
+  <!-- feet tucked in, blue sandals -->
+  <path d="M100 185c-7-4-12-2-12 4 0 5 6 8 14 8h18c8 0 14-3 14-8 0-6-5-8-12-4l-11 6z" fill="#2f4576"/>
+  <path d="M104 190h32" stroke="#1d2c4e" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- torso -->
+  <path d="M93 172c-1-27 3-42 27-42s28 15 27 42z" fill="url(#n-coat)"/>
+  <!-- collar panels -->
+  <path d="M105 131c5 9 10 13 15 13s10-4 15-13c-5-2-10-3-15-3s-10 1-15 3z" fill="#2f4576"/>
+  <path d="M120 144v28" stroke="#b4510a" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+
+  <!-- arms resting, hands joined in a seal -->
+  <path d="M96 141c-9 9-12 23-6 32 4 6 13 9 18 7" fill="none" stroke="url(#n-coat)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M144 141c9 9 12 23 6 32-4 6-13 9-18 7" fill="none" stroke="url(#n-coat)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M110 178c0-5 4-8 10-8s10 3 10 8c0 4-4 7-10 7s-10-3-10-7z" fill="#f3c396"/>
+  <path d="M120 170v15" stroke="#dba878" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- neck + head -->
+  <path d="M112 118h16v14h-16z" fill="#e0a877"/>
+  <circle cx="120" cy="92" r="34" fill="#f3c396"/>
+  <path d="M86 92c0 19 15 34 34 34s34-15 34-34c0-3 0-6-1-9H87c-1 3-1 6-1 9z" fill="#f3c396"/>
+
+  <!-- spiky hair: a crown of points, the way it should be -->
+  <path d="M84 90 L71 58 L92 75 L88 42 L106 69 L109 36 L120 63 L131 36 L134 69 L152 42 L148 75 L169 58 L156 90 C152 68 140 58 120 58 C100 58 88 68 84 90 Z" fill="url(#n-hair)"/>
+  <path d="M96 70c5-7 13-11 24-11s19 4 24 11c-4-11-14-17-24-17s-20 6-24 17z" fill="#fff" opacity=".28"/>
+
+  <!-- headband -->
+  <path d="M85 76h70v13H85z" fill="#2a3a5e"/>
+  <rect x="99" y="73" width="42" height="18" rx="4" fill="url(#n-plate)"/>
+  <!-- leaf swirl -->
+  <g fill="none" stroke="#5a6472" stroke-width="2.2" stroke-linecap="round">
+    <path d="M125 78c-4-2-10-2-12 2s-1 8 3 9 7-2 6-5"/>
+    <path d="M117 88l-5 5"/>
+  </g>
+
+  <!-- closed eyes, at peace -->
+  <path d="M103 99c3-3 8-3 11 0" fill="none" stroke="#3a2a1e" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M126 99c3-3 8-3 11 0" fill="none" stroke="#3a2a1e" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- whisker marks -->
+  <g stroke="#c98a5e" stroke-width="2" stroke-linecap="round" opacity=".9">
+    <path d="M90 99h9M90 105h9M90 111h8"/>
+    <path d="M141 99h9M141 105h9M142 111h8"/>
+  </g>
+
+  <!-- calm mouth -->
+  <path d="M114 114c3 2 9 2 12 0" fill="none" stroke="#3a2a1e" stroke-width="2.4" stroke-linecap="round"/>
+</svg>
