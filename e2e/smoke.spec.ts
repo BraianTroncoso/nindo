@@ -101,7 +101,7 @@ test("a task can be aimed at, and finishing a session credits it", async ({ page
   await seedRunningSession(page, 2500);
   await page.goto("/");
 
-  await expect(page.locator(".task__name")).toHaveText("wire up the player");
+  await expect(page.locator(".task__title")).toHaveText("wire up the player");
   await expect(page.locator(".clock__task")).toContainText("wire up the player");
   await expect(page.locator(".task[data-active]")).toBeVisible();
 
@@ -119,9 +119,9 @@ test("a task can be aimed at, and finishing a session credits it", async ({ page
   await page.screenshot(SHOT("04-sage-mode"));
 
   // The session is credited to the task and the break is queued.
-  await expect(page.locator(".task__count")).toHaveText("1");
-  await expect(page.locator(".clock__phase")).toContainText("short break");
-  await expect(page.locator(".cadence__count")).toHaveText("1 done today");
+  await expect(page.locator(".task__pomodoros")).toHaveText("●");
+  await expect(page.locator(".clock__phase")).toHaveText("short break");
+  await expect(page.locator(".cycle__count")).toHaveText("1 today");
 
   expect(errors).toEqual([]);
 });
@@ -132,8 +132,8 @@ test("the timer survives a deadline that passed while the tab was away", async (
   await page.goto("/");
 
   // Exactly one completion is reported, not eight hours' worth of cycles.
-  await expect(page.locator(".clock__phase")).toContainText("short break");
-  await expect(page.locator(".cadence__count")).toHaveText("1 done today");
+  await expect(page.locator(".clock__phase")).toHaveText("short break");
+  await expect(page.locator(".cycle__count")).toHaveText("1 today");
   await expect(page.locator(".clock__time")).toHaveText("5:00");
 });
 
@@ -144,7 +144,7 @@ test("the mascot can be switched off and the clock takes the centre", async ({ p
   await page.getByLabel("Close settings").click();
 
   await expect(page.locator(".mascot")).toHaveCount(0);
-  await expect(page.locator('.hero[data-mascot="off"]')).toBeVisible();
+  await expect(page.locator('.stage[data-mascot="off"]')).toBeVisible();
   await expect(page.locator(".clock__time")).toBeVisible();
   await page.screenshot(SHOT("05-no-mascot"));
 });
@@ -172,7 +172,7 @@ test("a pasted YouTube link resolves its real title with no API key", async ({ p
   await page.getByRole("button", { name: "Add", exact: true }).click();
 
   // oEmbed is keyless and CORS-enabled, so the title arrives client-side.
-  const title = page.locator(".queue__row .track__title").first();
+  const title = page.locator(".queue__item .spotus__title").first();
   await expect(title).toBeVisible({ timeout: 15_000 });
   await expect(title).not.toHaveText("jfKfPfyJRdk", { timeout: 15_000 });
   await page.screenshot(SHOT("07-spotus-queue"));
@@ -184,8 +184,8 @@ test("junk input is rejected with an explanation", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("YouTube URL").fill("https://vimeo.com/123456");
   await page.getByRole("button", { name: "Add", exact: true }).click();
-  await expect(page.locator(".note--warn")).toContainText("not a YouTube link");
-  await expect(page.locator(".queue__row")).toHaveCount(0);
+  await expect(page.locator(".spotus__message")).toContainText("not a YouTube link");
+  await expect(page.locator(".queue__item")).toHaveCount(0);
 });
 
 test("zen mode strips everything but the mascot and the clock", async ({ page }) => {
@@ -216,7 +216,7 @@ test("today's tasks are wiped when the calendar day changes", async ({ page }) =
   await page.reload();
 
   await expect(page.locator(".task")).toHaveCount(0);
-  await expect(page.locator(".tasks .note")).toBeVisible();
+  await expect(page.locator(".tasks__empty")).toBeVisible();
 });
 
 test("the app shell works offline once installed", async ({ page, context }) => {
@@ -232,6 +232,24 @@ test("the app shell works offline once installed", async ({ page, context }) => 
   await expect(page.locator('.mascot__pose[data-slot="idle"]')).toBeVisible();
   await page.screenshot(SHOT("09-offline"));
   await context.setOffline(false);
+});
+
+test("the mascot is actually alive, not a still frame", async ({ page }) => {
+  await page.goto("/");
+  const mascot = page.locator(".mascot__poses");
+  await expect(mascot).toBeVisible();
+  // Give the animated WebP a moment to start decoding.
+  await page.waitForTimeout(400);
+
+  // Two shots of the same element, far enough apart to cross frames of the loop.
+  const shots: Buffer[] = [];
+  for (let i = 0; i < 4; i++) {
+    shots.push(await mascot.screenshot());
+    await page.waitForTimeout(230);
+  }
+
+  const allIdentical = shots.every((shot) => shot.equals(shots[0]));
+  expect(allIdentical, "the idle pose never changed — it is a still image").toBe(false);
 });
 
 test("the layout holds up from a wide monitor down to a phone", async ({ page }) => {
@@ -255,6 +273,6 @@ test("the layout holds up from a wide monitor down to a phone", async ({ page })
 
     await expect(page.locator(".clock__time")).toBeVisible();
     await expect(page.locator(".mascot")).toBeVisible();
-    await page.screenshot({ path: `e2e/.artifacts/10-${name}.png`, fullPage: width < 1000 });
+    await page.screenshot({ path: `e2e/.artifacts/11-${name}.png`, fullPage: width < 1000 });
   }
 });

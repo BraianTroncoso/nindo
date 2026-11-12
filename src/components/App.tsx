@@ -19,7 +19,6 @@ export function App() {
   }, []);
 
   const showTasks = useNindo((s) => s.settings.showTasks);
-  const showSpotus = useNindo((s) => s.settings.showSpotus);
   const startTimer = useNindo((s) => s.startTimer);
   const pauseTimer = useNindo((s) => s.pauseTimer);
   const resetTimer = useNindo((s) => s.resetTimer);
@@ -36,8 +35,6 @@ export function App() {
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
 
-      const { updateSettings, settings } = useNindo.getState();
-
       switch (event.key.toLowerCase()) {
         case " ":
           event.preventDefault();
@@ -51,10 +48,7 @@ export function App() {
           skipPhase();
           break;
         case "t":
-          updateSettings({ showTasks: !settings.showTasks });
-          break;
-        case "m":
-          updateSettings({ showSpotus: !settings.showSpotus });
+          useNindo.getState().updateSettings({ showTasks: !useNindo.getState().settings.showTasks });
           break;
         case "f":
           setZen((z) => !z);
@@ -72,7 +66,7 @@ export function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [running, startTimer, pauseTimer, resetTimer, skipPhase]);
 
-  // Zen asks for real fullscreen, but works as a layout mode either way.
+  // Zen mode asks for real fullscreen, but works as a layout mode either way.
   useEffect(() => {
     if (zen && !document.fullscreenElement) {
       void document.documentElement.requestFullscreen?.().catch(() => {});
@@ -92,88 +86,43 @@ export function App() {
 
   return (
     <div className="shell" data-zen={zen ? "" : undefined}>
-      <header className="bar">
+      <header className="topbar">
         <h1 className="brand">
           <span className="brand__kanji">忍道</span>
           <span className="brand__name">nindo</span>
         </h1>
-
-        <nav className="bar__tools" aria-label="Panels">
-          <Toggle
-            on={showTasks}
-            label="tasks"
-            hint="Today's tasks (T)"
-            onClick={() => useNindo.getState().updateSettings({ showTasks: !showTasks })}
-          />
-          <Toggle
-            on={showSpotus}
-            label="spotus"
-            hint="Music (M)"
-            onClick={() => useNindo.getState().updateSettings({ showSpotus: !showSpotus })}
-          />
-          <Toggle on={zen} label="zen" hint="Zen mode (F)" onClick={() => setZen((z) => !z)} />
+        <div className="topbar__actions">
+          <button type="button" className="chip" onClick={() => setZen((z) => !z)} title="Zen mode (F)">
+            zen
+          </button>
           <button
             type="button"
-            className="tool"
+            className="chip"
             onClick={() => setSettingsOpen(true)}
             title="Settings (,)"
           >
             settings
           </button>
-        </nav>
+        </div>
       </header>
 
-      <main className="deck" data-left={showTasks ? "" : undefined} data-right={showSpotus ? "" : undefined}>
-        {showTasks ? (
-          <aside className="rail rail--left">
-            <TaskList />
-          </aside>
-        ) : null}
-
+      <main className="layout">
+        {showTasks ? <TaskList /> : null}
         <FocusStage />
-
-        {showSpotus ? (
-          <aside className="rail rail--right">
-            <SpotusBar />
-          </aside>
-        ) : null}
       </main>
 
-      <footer className="keys" aria-hidden>
-        <span><kbd>space</kbd> start</span>
-        <span><kbd>r</kbd> reset</span>
-        <span><kbd>s</kbd> skip</span>
-        <span><kbd>t</kbd> tasks</span>
-        <span><kbd>m</kbd> music</span>
-        <span><kbd>f</kbd> zen</span>
-      </footer>
+      <SpotusBar />
 
       {settingsOpen ? <SettingsPanel onClose={() => setSettingsOpen(false)} /> : null}
-    </div>
-  );
-}
 
-function Toggle({
-  on,
-  label,
-  hint,
-  onClick,
-}: {
-  on: boolean;
-  label: string;
-  hint: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className="tool"
-      data-on={on ? "" : undefined}
-      aria-pressed={on}
-      title={hint}
-      onClick={onClick}
-    >
-      {label}
-    </button>
+      <footer className="hints">
+        <span>space play/pause</span>
+        <span>r reset</span>
+        <span>s skip</span>
+        <span>t tasks</span>
+        <span>f zen</span>
+        <span>, settings</span>
+      </footer>
+    </div>
   );
 }

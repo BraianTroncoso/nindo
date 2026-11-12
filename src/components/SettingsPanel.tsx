@@ -18,7 +18,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
       <div className="sheet__panel">
         <header className="sheet__head">
           <h2>Settings</h2>
-          <button type="button" className="tool" onClick={onClose} aria-label="Close settings">
+          <button type="button" className="btn btn--icon" onClick={onClose} aria-label="Close settings">
             ×
           </button>
         </header>
@@ -30,7 +30,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               <button
                 key={name}
                 type="button"
-                className="tool"
+                className="chip"
                 data-on={
                   preset.focus === durations.focus && preset.shortBreak === durations.shortBreak
                     ? ""
@@ -84,7 +84,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               <button
                 key={pack.id}
                 type="button"
-                className="tool"
+                className="chip"
                 data-on={settings.mascot === pack.id ? "" : undefined}
                 onClick={() => updateSettings({ mascot: pack.id })}
                 title={pack.credits ?? pack.license}
@@ -94,7 +94,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             ))}
             <button
               type="button"
-              className="tool"
+              className="chip"
               data-on={settings.mascot === NO_MASCOT ? "" : undefined}
               onClick={() => updateSettings({ mascot: NO_MASCOT })}
             >
@@ -143,14 +143,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             />
             Show today&rsquo;s tasks
           </label>
-          <label className="sheet__toggle">
-            <input
-              type="checkbox"
-              checked={settings.showSpotus}
-              onChange={(e) => updateSettings({ showSpotus: e.target.checked })}
-            />
-            Show Spotus
-          </label>
         </section>
 
         <section className="sheet__group">
@@ -171,7 +163,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             />
             <button
               type="button"
-              className="tool"
+              className="btn"
               onClick={() => updateSettings({ youtubeApiKey: keyDraft.trim() })}
             >
               Save
@@ -179,7 +171,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             {settings.youtubeApiKey ? (
               <button
                 type="button"
-                className="tool"
+                className="btn"
                 onClick={() => {
                   setKeyDraft("");
                   updateSettings({ youtubeApiKey: "" });

@@ -18,9 +18,6 @@ export type Settings = {
   /** Bring-your-own-key for search. Never leaves this browser. */
   youtubeApiKey: string;
   showTasks: boolean;
-  /** The Spotus rail. */
-  showSpotus: boolean;
-  /** The video panel inside Spotus. */
   showPlayer: boolean;
   /** 0 → 1. */
   volume: number;
@@ -73,7 +70,6 @@ const DEFAULT_SETTINGS: Settings = {
   mascot: DEFAULT_MASCOT,
   youtubeApiKey: "",
   showTasks: true,
-  showSpotus: true,
   showPlayer: true,
   volume: 0.7,
 };

@@ -29,7 +29,19 @@ Rules that keep nindo fast and honest:
   shared centre and scale makes the change read as one character, not two.
 
 Tip: the idle pose gets a gentle breathing loop for free (`"breathe": true`), so
-draw it still.
+a still drawing is fine.
+
+**If you want the resting pose genuinely alive**, ship an *animated* WebP or GIF
+and leave `breathe` off — the browser loops it natively, which costs no
+JavaScript and no battery beyond decoding. The `naruto` pack does this: fourteen
+frames of real footage, ping-ponged so the loop has no seam, 111 ms apart.
+
+```bash
+# frames/001.png … frames/014.png  →  a seamless looping idle
+ffmpeg -framerate 9 -i frames/%03d.png -c:v libwebp_anim -loop 0 -q:v 62 idle.webp
+```
+
+Ping-pong the frames (1→n→1) and any clip loops, even one with camera drift.
 
 ## 2. Write the manifest
 
