@@ -25,6 +25,11 @@ export function FocusStage() {
   const durations = useNindo((s) => s.settings.durations);
   const settings = useNindo((s) => s.settings);
   const mascotState = useNindo((s) => s.mascotState);
+  const zenShowTrack = useNindo((s) => s.settings.zenShowTrack);
+  const nowPlaying = useNindo((s) => {
+    if (!s.spotus.playing) return null;
+    return s.spotus.playlist.find((t) => t.id === s.spotus.currentId) ?? null;
+  });
   const activeTaskId = useNindo((s) => s.tasks.activeTaskId);
   const activeTitle = useNindo(
     (s) => s.tasks.tasks.find((t) => t.id === s.tasks.activeTaskId)?.title ?? null,
@@ -57,6 +62,16 @@ export function FocusStage() {
       window.removeEventListener("focus", onWake);
     };
   }, [running]);
+
+  // The charge belongs to the whole room, so it is written to :root. Scoping it
+  // to the stage would leave the backdrop behind body::before frozen at zero.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--charge", charge.toFixed(3));
+    return () => {
+      root.style.removeProperty("--charge");
+    };
+  }, [charge]);
 
   // Phase completion → credit the task, ring, notify, transform.
   const handled = useRef<number | null>(null);
@@ -96,18 +111,7 @@ export function FocusStage() {
   const sessionDots = Array.from({ length: Math.max(1, durations.longBreakEvery) });
 
   return (
-    <section
-      className="stage"
-      data-mascot={pack ? "on" : "off"}
-      style={
-        {
-          "--charge": charge.toFixed(3),
-          ...(pack?.theme?.accent ? { "--accent": pack.theme.accent } : {}),
-          ...(pack?.theme?.glow ? { "--glow": pack.theme.glow } : {}),
-          ...(pack?.theme?.bg ? { "--bg": pack.theme.bg } : {}),
-        } as React.CSSProperties
-      }
-    >
+    <section className="stage" data-mascot={pack ? "on" : "off"}>
       {pack ? <MascotStage pack={pack} charge={charge} state={mascotState} /> : null}
 
       <div className="clock">
@@ -127,6 +131,15 @@ export function FocusStage() {
           )}
         </p>
       </div>
+
+      {/* Only ever shown in zen, where the player bar is hidden but the music
+          keeps going — otherwise you cannot tell what is playing. */}
+      {zenShowTrack && nowPlaying ? (
+        <p className="stage__track" title={nowPlaying.title}>
+          <span className="stage__track-dot" aria-hidden />
+          {nowPlaying.title}
+        </p>
+      ) : null}
 
       <div className="controls">
         <button

@@ -51,6 +51,8 @@ async function seedRunningSession(page: Page, endsInMs: number, withTask = true)
               showTasks: true,
               showPlayer: true,
               volume: 0.7,
+              palette: "auto",
+              zenShowTrack: true,
             },
             timer: {
               phase: "focus",
@@ -311,4 +313,79 @@ test("the stylesheet is actually applied, not merely downloaded", async ({ page 
       "0px",
     );
   }
+});
+
+test("there is nothing to drag in: local audio is gone", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator('input[type="file"]')).toHaveCount(0);
+  await expect(page.getByText("local audio")).toHaveCount(0);
+  await expect(page.locator(".player__empty")).toContainText("Paste a YouTube link");
+});
+
+test("the room tone can be changed, and it repaints the whole page", async ({ page }) => {
+  await page.goto("/");
+
+  const pageTone = () =>
+    page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+
+  const warm = await pageTone();
+
+  await page.getByTitle("Settings (,)").click();
+  await page.getByTitle("Ink").click();
+  await page.getByLabel("Close settings").click();
+
+  const cool = await pageTone();
+  expect(cool).not.toBe(warm);
+  // #0a0e15 — the background really follows the palette, not just a swatch.
+  expect(cool).toBe("rgb(10, 14, 21)");
+
+  // The accent follows too, so the clock glow and buttons stay coherent.
+  const accent = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--accent").trim(),
+  );
+  expect(accent).toBe("#6f9fd8");
+
+  await page.screenshot({ path: "e2e/.artifacts/12-palette-ink.png" });
+
+  // And it survives a reload, because it is a setting and not a mood.
+  await page.reload();
+  expect(await pageTone()).toBe("rgb(10, 14, 21)");
+});
+
+test("zen leaves only the mascot, the clock and what is playing", async ({ page }) => {
+  await seedRunningSession(page, 60_000);
+  await page.goto("/");
+
+  // Queue something so there is a track to report.
+  await page.getByLabel("YouTube URL").fill("https://www.youtube.com/watch?v=jfKfPfyJRdk");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(page.locator(".queue__item .spotus__title").first()).toBeVisible({
+    timeout: 15_000,
+  });
+
+  await page.getByTitle("Zen mode (F)").click();
+
+  await expect(page.locator(".shell[data-zen]")).toBeVisible();
+  for (const hidden of [".topbar", ".tasks", ".spotus", ".hints", ".cycle", ".clock__task"]) {
+    await expect(page.locator(hidden)).toBeHidden();
+  }
+  await expect(page.locator(".mascot")).toBeVisible();
+  await expect(page.locator(".clock__time")).toBeVisible();
+
+  // The player bar is hidden but still mounted, so the music keeps going —
+  // which is exactly why zen needs to say what is playing.
+  await expect(page.locator(".stage__track")).toBeVisible();
+  await expect(page.locator(".stage__track")).toContainText("lofi");
+
+  // Everything that is left must sit inside the viewport, centred — hiding the
+  // other rows once left the stage pinned to the top with the mascot clipped.
+  const box = await page.locator(".stage").boundingBox();
+  const view = page.viewportSize();
+  if (!box || !view) throw new Error("no stage");
+  expect(box.y, "the stage is clipped at the top").toBeGreaterThan(8);
+  expect(box.y + box.height, "the stage overflows the bottom").toBeLessThan(view.height - 8);
+  const centre = box.y + box.height / 2;
+  expect(Math.abs(centre - view.height / 2), "the stage is not vertically centred").toBeLessThan(40);
+
+  await page.screenshot({ path: "e2e/.artifacts/13-zen.png" });
 });

@@ -8,11 +8,10 @@ whatever you put in it.
 │ [paste] [search*]  paste a YouTube video or playlist URL  │
 │ ▸ lofi hip hop radio — Lofi Girl          ‹‹ ❚❚ ››  ──●── │
 │   deep focus mix                                          │
-│   + local audio                                           │
 └───────────────────────────────────────────────────────────┘
 ```
 
-## Three ways to feed it
+## Two ways to feed it
 
 **1. Paste a link — no key, no setup.** Video URLs, `youtu.be` links, `/shorts/`,
 `/live/`, `music.youtube.com`, playlists, or a bare 11-character video id. The
@@ -29,12 +28,7 @@ GET https://www.youtube.com/oembed?url=<encoded>&format=json
 If YouTube declines to answer, the track still queues with its id as the title.
 A song that plays under an ugly name beats an error you cannot act on.
 
-**2. Drop your own files.** Drag audio anywhere onto the bar, or use
-*+ local audio*. They play through a plain `<audio>` element and wire up the OS
-media keys through the Media Session API. Nothing is uploaded. Nothing is kept:
-object URLs die with the tab, so local tracks are deliberately not persisted.
-
-**3. Search, with your own API key.** Settings → *Spotus search* → paste a
+**2. Search, with your own API key.** Settings → *Spotus search* → paste a
 YouTube Data API v3 key. It is stored in your browser, spends **your** quota
 (10,000 units/day ≈ 100 searches), and is sent only to `googleapis.com`.
 
@@ -114,3 +108,11 @@ type SearchProvider = {
 Anything that can return `Track[]` from the browser fits — Audius and the Radio
 Browser API are both keyless, CORS-friendly and legal, and would make good
 additions. See `src/features/spotus/providers.ts`.
+
+## What is deliberately missing
+
+**Local audio files.** Drag-and-drop was built and then removed: it meant a file
+input, a second player implementation, object URLs that die with the session,
+and a queue holding two kinds of track that behave differently. For a panel
+whose whole job is to be ignored while you work, that was a lot of surface for
+something you can do in any music player you already have open.

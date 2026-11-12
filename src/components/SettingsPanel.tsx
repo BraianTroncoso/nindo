@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { characterPacks, NO_MASCOT } from "@/characters/registry";
+import { FOLLOW_MASCOT, PALETTES } from "@/features/theme/palettes";
 import { PRESETS } from "@/features/timer/types";
 import { requestNotifications } from "@/lib/notify";
 import { useNindo } from "@/store/useNindo";
@@ -111,6 +112,48 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         </section>
 
         <section className="sheet__group">
+          <h3>Room tone</h3>
+          <p className="sheet__note">
+            The background you will be staring at all day. All of them are dim on purpose.
+          </p>
+          <div className="swatches">
+            <button
+              type="button"
+              className="swatch swatch--auto"
+              data-on={settings.palette === FOLLOW_MASCOT ? "" : undefined}
+              onClick={() => updateSettings({ palette: FOLLOW_MASCOT })}
+              title="Let the mascot choose"
+            >
+              <span className="swatch__chip" />
+              <span className="swatch__name">auto</span>
+            </button>
+
+            {PALETTES.map((palette) => (
+              <button
+                key={palette.id}
+                type="button"
+                className="swatch"
+                data-on={settings.palette === palette.id ? "" : undefined}
+                onClick={() => updateSettings({ palette: palette.id })}
+                title={palette.name}
+              >
+                <span
+                  className="swatch__chip"
+                  style={
+                    {
+                      background: palette.bg,
+                      "--sw-accent": palette.accent,
+                      "--sw-glow": palette.glow,
+                    } as React.CSSProperties
+                  }
+                />
+                <span className="swatch__name">{palette.name.toLowerCase()}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="sheet__group">
           <h3>Signals</h3>
           <label className="sheet__toggle">
             <input
@@ -142,6 +185,14 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               onChange={(e) => updateSettings({ showTasks: e.target.checked })}
             />
             Show today&rsquo;s tasks
+          </label>
+          <label className="sheet__toggle">
+            <input
+              type="checkbox"
+              checked={settings.zenShowTrack}
+              onChange={(e) => updateSettings({ zenShowTrack: e.target.checked })}
+            />
+            Show what is playing in zen mode
           </label>
         </section>
 

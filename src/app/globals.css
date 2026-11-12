@@ -50,7 +50,11 @@ body::before {
       color-mix(in srgb, var(--accent) calc(6% + var(--charge) * 16%), transparent) 0%,
       transparent 62%
     ),
-    radial-gradient(80% 60% at 50% 110%, rgba(255, 150, 60, 0.07) 0%, transparent 70%);
+    radial-gradient(
+      80% 60% at 50% 110%,
+      color-mix(in srgb, var(--glow) calc(3% + var(--charge) * 5%), transparent) 0%,
+      transparent 70%
+    );
   transition: background 600ms linear;
   z-index: 0;
 }
@@ -676,23 +680,6 @@ body::before {
   padding: 0 0.4rem;
 }
 
-.queue__drop {
-  padding: 0.3rem 0.1rem 0;
-}
-
-.queue__drop label {
-  display: inline-block;
-  cursor: pointer;
-}
-
-/* The native file control is unstyleable and ugly; the label is the button. */
-.queue__drop input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
 
 .player {
   display: grid;
@@ -729,6 +716,73 @@ body::before {
   font-size: 0.76rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+/* ── palette swatches ────────────────────────────────────────────────────── */
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 0.5rem;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.3rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 140ms, color 140ms;
+}
+
+.swatch:hover {
+  color: var(--ink);
+}
+
+.swatch[data-on] {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--ink);
+}
+
+/* Each chip is the palette in miniature: the room, its accent, its glow. */
+.swatch__chip {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 7px;
+  border: 1px solid var(--panel-line);
+  overflow: hidden;
+}
+
+.swatch__chip::before {
+  content: "";
+  position: absolute;
+  inset: 22% 18% auto 18%;
+  height: 34%;
+  border-radius: 999px;
+  background: var(--sw-accent, var(--accent));
+}
+
+.swatch__chip::after {
+  content: "";
+  position: absolute;
+  inset: auto 34% 16% 34%;
+  height: 16%;
+  border-radius: 999px;
+  background: var(--sw-glow, var(--glow));
+  opacity: 0.75;
+}
+
+.swatch--auto .swatch__chip {
+  background: linear-gradient(135deg, #171109 0 50%, #0a0e15 50% 100%);
 }
 
 /* ── settings sheet ──────────────────────────────────────────────────────── */
@@ -936,14 +990,63 @@ button:focus-visible {
   color: color-mix(in srgb, var(--muted) 70%, transparent);
 }
 
+/* The track line only earns its place in zen, where the player bar is gone. */
+.stage__track {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  max-width: min(60ch, 70vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--muted) 85%, transparent);
+}
+
+.stage__track-dot {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: nindo-pulse 2.6s ease-in-out infinite;
+}
+
 /* ── zen mode: the mascot, the clock, nothing else ───────────────────────── */
 
 .shell[data-zen] .topbar,
 .shell[data-zen] .tasks,
 .shell[data-zen] .spotus,
 .shell[data-zen] .hints,
-.shell[data-zen] .cycle {
+.shell[data-zen] .cycle,
+.shell[data-zen] .clock__task,
+.shell[data-zen] .controls {
   display: none;
+}
+
+.shell[data-zen] .stage__track {
+  display: flex;
+}
+
+/* Hiding the controls should not strand anyone: move the mouse and they
+   return. The keyboard works the whole time either way. */
+.shell[data-zen]:hover .controls {
+  display: flex;
+  opacity: 0.55;
+  transition: opacity 200ms;
+}
+
+.shell[data-zen] .controls:hover {
+  opacity: 1;
+}
+
+/* Hidden children are removed from the grid entirely, so the layout would land
+   in the first `auto` row and sit pinned to the top with the 1fr row empty
+   underneath. In zen there is only one row, and it takes everything. */
+.shell[data-zen] {
+  grid-template-rows: 1fr;
 }
 
 .shell[data-zen] .layout {

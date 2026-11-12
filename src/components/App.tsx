@@ -5,6 +5,7 @@ import { FocusStage } from "@/components/FocusStage";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { SpotusBar } from "@/features/spotus/SpotusBar";
 import { TaskList } from "@/features/tasks/TaskList";
+import { useApplyRoomTheme } from "@/features/theme/useRoomTheme";
 import { useNindo } from "@/store/useNindo";
 
 export function App() {
@@ -27,6 +28,7 @@ export function App() {
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [zen, setZen] = useState(false);
+  useApplyRoomTheme();
 
   // Keyboard first: this thing lives next to an editor.
   useEffect(() => {

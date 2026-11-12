@@ -12,7 +12,8 @@ src/
 │   ├── timer/        core.ts (pure) + types
 │   ├── tasks/        core.ts (pure) + TaskList
 │   ├── mascot/       types (the pack contract) + MascotStage (the engine)
-│   └── spotus/       parse · oembed · providers · players · bar
+│   ├── theme/        the room palettes and the one hook that applies them
+│   └── spotus/       parse · oembed · providers · player · bar
 ├── characters/       the packs themselves — data, not code
 ├── store/            one zustand store, persisted to localStorage
 └── lib/              time, sound, notifications
@@ -40,6 +41,13 @@ A deadline that passed while you were away reports **exactly one** completion an
 leaves the next phase queued but not running. Silently chaining through eight
 hours of missed cycles would be a lie about work you did not do.
 
+**One place decides the colours.** `useApplyRoomTheme` resolves the chosen
+palette against the mascot's own tone and writes `--bg`, `--accent` and `--glow`
+to `:root`. It has to be the root rather than the app shell: the page background
+and the pool of light behind everything are painted by `body`, which a variable
+scoped to a descendant would never reach. A chosen palette beats the pack, so
+the setting never silently loses to a character.
+
 **Animation lives in CSS, driven by custom properties.** Session progress is
 written once per tick to `--charge` (0 → 1). The aura, the ring, the glow on the
 clock and the warmth of the background all read it. React never re-renders for
@@ -62,7 +70,7 @@ One zustand store with the `persist` middleware, key `nindo`, version 1.
 | `settings` | yes | durations, mascot choice, volume, API key |
 | `timer` | yes | the deadline survives a restart, which is the point |
 | `tasks` | yes, but day-scoped | `merge` runs `rollToDay()`, so reopening on a new day starts empty |
-| `spotus.playlist` | yes, minus local files | object URLs die with the session; persisting them would resurrect dead links |
+| `spotus.playlist` | yes | ids and titles only; there is nothing heavier to keep |
 | `mascotState` | no | always re-derived from the timer |
 
 Hydration is manual (`skipHydration: true`) and the app renders a boot screen

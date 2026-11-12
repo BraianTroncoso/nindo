@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useNindo } from "@/store/useNindo";
-import { LocalPlayer } from "./LocalPlayer";
 import { YouTubePlayer } from "./YouTubePlayer";
 import { trackFromInput } from "./oembed";
 import { youtubeByok } from "./providers";
@@ -29,7 +28,6 @@ export function SpotusBar() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [results, setResults] = useState<Track[] | null>(null);
-  const fileRef = useRef<HTMLInputElement | null>(null);
 
   const current = playlist.find((t) => t.id === currentId) ?? null;
 
@@ -62,31 +60,8 @@ export function SpotusBar() {
     }
   }
 
-  function onFiles(files: FileList | null) {
-    if (!files) return;
-    for (const file of Array.from(files)) {
-      if (!file.type.startsWith("audio/")) continue;
-      addTrack({
-        id: `local:${file.name}:${file.size}`,
-        source: "local",
-        title: file.name.replace(/\.[^.]+$/, ""),
-        author: "local file",
-        objectUrl: URL.createObjectURL(file),
-      });
-    }
-    if (fileRef.current) fileRef.current.value = "";
-  }
-
   return (
-    <section
-      className="spotus"
-      aria-label="Spotus player"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        onFiles(e.dataTransfer.files);
-      }}
-    >
+    <section className="spotus" aria-label="Spotus player">
       <div className="spotus__row">
         <div className="spotus__modes">
           <button
@@ -192,17 +167,7 @@ export function SpotusBar() {
       {showPlayer ? (
         <div className="spotus__body">
           <div className="player">
-            {current?.source === "local" ? (
-              <LocalPlayer
-                track={current}
-                playing={playing}
-                volume={volume}
-                onPlayingChange={setPlaying}
-                onEnded={() => playNext(1)}
-                onNext={() => playNext(1)}
-                onPrevious={() => playNext(-1)}
-              />
-            ) : current ? (
+            {current ? (
               <YouTubePlayer
                 key={current.id}
                 track={current}
@@ -213,9 +178,7 @@ export function SpotusBar() {
                 onError={setMessage}
               />
             ) : (
-              <p className="player__empty">
-                Paste a link, search, or drop an audio file anywhere in this bar.
-              </p>
+              <p className="player__empty">Paste a YouTube link to start.</p>
             )}
           </div>
 
@@ -236,19 +199,6 @@ export function SpotusBar() {
                 </button>
               </li>
             ))}
-            <li className="queue__drop">
-              <label className="chip">
-                + local audio
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="audio/*"
-                  multiple
-                  onChange={(e) => onFiles(e.target.files)}
-                  aria-label="Add local audio files"
-                />
-              </label>
-            </li>
           </ul>
         </div>
       ) : null}

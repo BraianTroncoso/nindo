@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { DEFAULT_MASCOT, type MascotChoice } from "@/characters/registry";
+import { FOLLOW_MASCOT, type PaletteChoice } from "@/features/theme/palettes";
 import type { MascotState } from "@/features/mascot/types";
 import * as timer from "@/features/timer/core";
 import { DEFAULT_DURATIONS, type Durations, type Phase, type TimerSnapshot } from "@/features/timer/types";
@@ -15,6 +16,10 @@ export type Settings = {
   soundEnabled: boolean;
   notificationsEnabled: boolean;
   mascot: MascotChoice;
+  /** Room tone. "auto" lets the mascot pack choose. */
+  palette: PaletteChoice;
+  /** Keep the now-playing line visible in zen mode. */
+  zenShowTrack: boolean;
   /** Bring-your-own-key for search. Never leaves this browser. */
   youtubeApiKey: string;
   showTasks: boolean;
@@ -68,6 +73,8 @@ const DEFAULT_SETTINGS: Settings = {
   soundEnabled: true,
   notificationsEnabled: false,
   mascot: DEFAULT_MASCOT,
+  palette: FOLLOW_MASCOT,
+  zenShowTrack: true,
   youtubeApiKey: "",
   showTasks: true,
   showPlayer: true,
@@ -190,9 +197,7 @@ export const useNindo = create<NindoState>()(
         timer: state.timer,
         tasks: state.tasks,
         spotus: {
-          // Local files live on object URLs that die with the session; persisting
-          // them would resurrect dead links on the next visit.
-          playlist: state.spotus.playlist.filter((t) => t.source !== "local"),
+          playlist: state.spotus.playlist,
           currentId: state.spotus.currentId,
           playing: false,
         },

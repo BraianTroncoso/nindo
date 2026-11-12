@@ -1,14 +1,12 @@
-export type TrackSource = "youtube" | "youtube-playlist" | "local";
+export type TrackSource = "youtube" | "youtube-playlist";
 
 export type Track = {
-  /** YouTube video id, playlist id, or a local object-URL key. */
+  /** YouTube video or playlist id. */
   id: string;
   source: TrackSource;
   title: string;
   author?: string;
   thumb?: string;
-  /** Only set for local files; object URLs die with the session. */
-  objectUrl?: string;
 };
 
 export type SearchProvider = {
