@@ -49,7 +49,7 @@ export const youtubeByok: SearchProvider = {
       throw new Error(
         data.error?.message ??
           (res.status === 403
-            ? "YouTube rejected the key (quota exhausted or API not enabled)."
+            ? "YouTube rejected that key. Check the quota and that the Data API is enabled."
             : `YouTube search failed (${res.status}).`),
       );
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FocusStage } from "@/components/FocusStage";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { SpotusBar } from "@/features/spotus/SpotusBar";
@@ -30,6 +30,32 @@ export function App() {
   const [zen, setZen] = useState(false);
   useApplyRoomTheme();
 
+  /**
+   * Zen is fullscreen and nothing else, so the browser owns the state and we
+   * follow it. Leaving fullscreen any way at all — Esc, F11, the window
+   * manager — puts the interface back. Before this, Esc dropped you out of
+   * fullscreen while the app stayed stripped bare with no obvious way home.
+   */
+  useEffect(() => {
+    const sync = () => setZen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+
+  const toggleZen = useCallback(() => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => setZen(false));
+      return;
+    }
+    const request = document.documentElement.requestFullscreen?.();
+    if (!request) {
+      // No fullscreen available (iOS Safari): fall back to the layout alone.
+      setZen((z) => !z);
+      return;
+    }
+    void request.catch(() => setZen(true));
+  }, []);
+
   // Keyboard first: this thing lives next to an editor.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -53,11 +79,12 @@ export function App() {
           useNindo.getState().updateSettings({ showTasks: !useNindo.getState().settings.showTasks });
           break;
         case "f":
-          setZen((z) => !z);
+          toggleZen();
           break;
         case "escape":
           setSettingsOpen(false);
-          setZen(false);
+          if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+          else setZen(false);
           break;
         case ",":
           setSettingsOpen((open) => !open);
@@ -66,17 +93,7 @@ export function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [running, startTimer, pauseTimer, resetTimer, skipPhase]);
-
-  // Zen mode asks for real fullscreen, but works as a layout mode either way.
-  useEffect(() => {
-    if (zen && !document.fullscreenElement) {
-      void document.documentElement.requestFullscreen?.().catch(() => {});
-    }
-    if (!zen && document.fullscreenElement) {
-      void document.exitFullscreen?.().catch(() => {});
-    }
-  }, [zen]);
+  }, [running, startTimer, pauseTimer, resetTimer, skipPhase, toggleZen]);
 
   if (!hydrated) {
     return (
@@ -94,8 +111,8 @@ export function App() {
           <span className="brand__name">nindo</span>
         </h1>
         <div className="topbar__actions">
-          <button type="button" className="chip" onClick={() => setZen((z) => !z)} title="Zen mode (F)">
-            zen
+          <button type="button" className="chip" onClick={toggleZen} title="Fullscreen (F)">
+            {zen ? "exit" : "fullscreen"}
           </button>
           <button
             type="button"
@@ -122,7 +139,7 @@ export function App() {
         <span>r reset</span>
         <span>s skip</span>
         <span>t tasks</span>
-        <span>f zen</span>
+        <span>f fullscreen</span>
         <span>, settings</span>
       </footer>
     </div>

@@ -50,7 +50,7 @@ export function TaskList() {
           className="input"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="what are you doing today?"
+          placeholder="what are you working on?"
           maxLength={120}
           aria-label="New task"
         />
@@ -84,7 +84,7 @@ export function TaskList() {
                 focusTask(task.id);
                 startTimer();
               }}
-              title="Focus on this and start the timer"
+              title="Point the timer at this and start"
             >
               aim
             </button>
@@ -103,7 +103,7 @@ export function TaskList() {
 
       {tasks.length === 0 ? (
         <p className="tasks__empty">
-          Today only. Whatever you write here is gone tomorrow — that is the point.
+          Today only. Tomorrow this list starts empty again.
         </p>
       ) : null}
     </aside>

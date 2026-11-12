@@ -16,7 +16,7 @@
 ```
 
 **A pomodoro that sits beside your editor.**
-Today's tasks, a mascot that powers up while you work, and a quiet player — all in one warm screen.
+Today's tasks, a mascot that powers up while you work, and a quiet player, all on one warm screen.
 
 [![PWA](https://img.shields.io/badge/PWA-installable-ff8a3d?style=flat-square)](#install-it)
 [![No backend](https://img.shields.io/badge/backend-none-ffd27a?style=flat-square)](#what-leaves-your-browser)
@@ -32,9 +32,10 @@ Today's tasks, a mascot that powers up while you work, and a quiet player — al
 You sit down. You write what you are doing today. You aim the timer at one of
 those lines and start.
 
-While you focus, the mascot meditates and the screen slowly warms up — the
-chakra gauge is literally the progress of your session. When the timer hits
-zero, there is a flash, the room shakes, and your mascot stands up transformed.
+While you focus, the mascot meditates and the room slowly warms up. That glow
+is the session itself: the further you get, the brighter it burns. When the
+timer hits zero there is a flash, the room shakes, and your mascot stands up
+transformed.
 
 Then it hands you the break, and the task gets its dot.
 
@@ -49,17 +50,17 @@ That is the whole product. Everything else is in service of not breaking that lo
 
 | | |
 |---|---|
-| **Timer** | 25/5 and 50/10 presets or your own numbers, long break every N sessions. Survives sleep, tab throttling and browser restarts — it tracks a deadline, not a countdown. |
+| **Timer** | 25/5 and 50/10 presets or your own numbers, with a long break every N sessions. Survives sleep, tab throttling and browser restarts, because it tracks a deadline instead of counting down. |
 | **Today** | A list that exists for exactly one day. Aim the timer at a task, and finishing a session credits it. Tomorrow it is gone, on purpose. |
 | **Mascots** | Pluggable character packs. Naruto ships as pack #1 with the real sage-mode awakening played frame by frame, Ember is the original CC0 one, and you can [add yours](docs/CHARACTERS.md) with two images and zero code. Or turn the mascot off entirely. |
-| **Spotus** | Paste as many YouTube links as you like — they queue up without interrupting, each one is dropped once it finishes, and when the last ends YouTube's own mix keeps the music going. Search too, if you bring an API key. |
+| **Spotus** | Paste as many YouTube links as you like. They wait their turn instead of interrupting, each one leaves the queue once it has played, and when the last ends YouTube's own mix keeps the music going. Search too, if you bring an API key. |
 | **Room tone** | Seven dim palettes to pick the background you will stare at all day, or `auto` to let the mascot choose. |
-| **Zen mode** | `F` — the mascot, the clock, and the track that is playing. Nothing else. Move the mouse and the controls come back. |
+| **Fullscreen** | `F` leaves the mascot, the clock and the name of whatever is playing. Nothing else. Move the mouse for the controls, and leave fullscreen however you like to get the interface back. |
 | **Offline** | Installable PWA. The whole shell is precached; the timer and your list work with the network unplugged. |
 
 ```
- space  play / pause      r  reset      s  skip
-     t  tasks                 f  zen        ,  settings
+ space  play / pause      r  reset           s  skip
+     t  tasks                 f  fullscreen      ,  settings
 ```
 
 ## Install it
@@ -76,7 +77,7 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-Deploy anywhere that serves static files — `npm run build` produces `out/`.
+Deploy anywhere that serves static files. `npm run build` produces `out/`.
 On Vercel: import the repo, accept the defaults, done. The free tier is plenty,
 because there is nothing to run on a server.
 
@@ -88,9 +89,9 @@ Almost nothing, and never silently:
   settings, playlist and API key live in `localStorage` and nowhere else.
 - **No fonts, scripts or icons from a CDN.** The bell is synthesised with
   WebAudio instead of shipping an mp3.
-- **YouTube is contacted only when you use Spotus** — once to read a video's
-  title via the keyless oEmbed endpoint, and then by the official embedded
-  player. Never on a session without music.
+- **YouTube is contacted only when you use Spotus.** Once to read a video's
+  title through the keyless oEmbed endpoint, then by the official embedded
+  player. Never during a session without music.
 
 Clearing site data resets nindo to factory. That is the entire data policy.
 
@@ -105,25 +106,25 @@ public/characters/<your-id>/active.svg    ← transformed
 ```
 
 The flash, the shake, the sparks and the crossfade are done in code, so **two
-still images are enough** — you never animate anything. Full walkthrough and the
-house rules: **[docs/CHARACTERS.md](docs/CHARACTERS.md)**.
+still images are enough**. You never have to animate anything. Full walkthrough
+and the house rules: **[docs/CHARACTERS.md](docs/CHARACTERS.md)**.
 
 PRs with new packs are the kind of PR this repo exists for.
 
 ## Docs
 
-- [Architecture](docs/ARCHITECTURE.md) — how the pieces fit, and why the timer is built on deadlines
-- [Characters](docs/CHARACTERS.md) — build a mascot pack
-- [Spotus](docs/SPOTUS.md) — the player, the search key, and the three approaches that were measured and rejected
+- [Architecture](docs/ARCHITECTURE.md) · how the pieces fit, and why the timer is built on deadlines
+- [Characters](docs/CHARACTERS.md) · build a mascot pack
+- [Spotus](docs/SPOTUS.md) · the queue, the search key, and three approaches that were measured and rejected
 - [Contributing](docs/CONTRIBUTING.md)
-- [Legal](docs/LEGAL.md) — the fan-art policy, stated plainly
+- [Legal](docs/LEGAL.md) · the fan-art policy, stated plainly
 - [Roadmap](docs/ROADMAP.md)
 
 ## Licence
 
 Code: [MIT](LICENSE).
 
-Art is licensed **per pack** — check `character.json`. The `ember` pack is CC0.
+Art is licensed **per pack**; check `character.json`. The `ember` pack is CC0.
 
 The `naruto` pack is **frames from the anime**: Naruto is © Masashi Kishimoto /
 Shueisha / Pierrot, this project is not affiliated with or endorsed by them, and

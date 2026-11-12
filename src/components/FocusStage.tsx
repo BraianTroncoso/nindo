@@ -87,8 +87,8 @@ export function FocusStage() {
       notify(
         result.completed === "focus" ? "Sage mode" : "Back to it",
         result.completed === "focus"
-          ? "Focus session complete. Take the break."
-          : "Break over. Next session is ready.",
+          ? "Session done. Take the break."
+          : "Break over. The next session is ready.",
       );
     }
   }, [snapshot, now, durations, settings.soundEnabled, settings.notificationsEnabled, completePhase]);
@@ -104,8 +104,8 @@ export function FocusStage() {
   // Countdown in the tab title, so it is readable from the taskbar.
   useEffect(() => {
     document.title = running
-      ? `${formatClock(remaining)} · ${PHASE_LABEL[snapshot.phase]} — nindo`
-      : "nindo — my focus way";
+      ? `${formatClock(remaining)} · ${PHASE_LABEL[snapshot.phase]} · nindo`
+      : "nindo · my focus way";
   }, [running, remaining, snapshot.phase]);
 
   const sessionDots = Array.from({ length: Math.max(1, durations.longBreakEvery) });
@@ -126,7 +126,7 @@ export function FocusStage() {
             </>
           ) : (
             <span className="clock__task-empty">
-              {activeTaskId ? "" : "pick a task to aim at"}
+              {activeTaskId ? "" : "no task picked"}
             </span>
           )}
         </p>

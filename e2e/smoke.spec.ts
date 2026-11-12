@@ -192,7 +192,7 @@ test("junk input is rejected with an explanation", async ({ page }) => {
 
 test("zen mode strips everything but the mascot and the clock", async ({ page }) => {
   await page.goto("/");
-  await page.getByTitle("Zen mode (F)").click();
+  await page.getByTitle("Fullscreen (F)").click();
 
   await expect(page.locator(".shell[data-zen]")).toBeVisible();
   await expect(page.locator(".tasks")).toBeHidden();
@@ -281,6 +281,9 @@ test("the layout holds up from a wide monitor down to a phone", async ({ page })
 
 test("the stylesheet is actually applied, not merely downloaded", async ({ page }) => {
   await page.goto("/");
+  // Hydration swaps the boot screen for the real shell; probing before that
+  // measures an element that does not exist yet.
+  await expect(page.locator(".layout")).toBeVisible();
 
   // A stale bundler cache once served the stylesheet of a different layout:
   // every file was 200 OK, the CSS parsed, and the app still rendered as naked
@@ -363,7 +366,7 @@ test("zen leaves only the mascot, the clock and what is playing", async ({ page 
     timeout: 15_000,
   });
 
-  await page.getByTitle("Zen mode (F)").click();
+  await page.getByTitle("Fullscreen (F)").click();
 
   await expect(page.locator(".shell[data-zen]")).toBeVisible();
   for (const hidden of [".topbar", ".tasks", ".spotus", ".hints", ".cycle", ".clock__task"]) {
@@ -438,4 +441,39 @@ test("a YouTube mix is recognised as a radio, not a playlist", async ({ page }) 
   await expect(frame.locator("body")).not.toBeEmpty({ timeout: 20_000 });
 
   await page.screenshot({ path: "e2e/.artifacts/16-radio.png" });
+});
+
+test("leaving fullscreen leaves zen, however you leave it", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTitle("Fullscreen (F)").click();
+  await expect(page.locator(".shell[data-zen]")).toBeVisible();
+  await expect(page.locator(".topbar")).toBeHidden();
+
+  // Esc, F11 and the window manager all end up here. Before, the app stayed
+  // stripped bare with the interface gone and no obvious way back.
+  await page.evaluate(() => document.exitFullscreen());
+
+  await expect(page.locator(".shell[data-zen]")).toHaveCount(0);
+  await expect(page.locator(".topbar")).toBeVisible();
+  await expect(page.locator(".spotus")).toBeVisible();
+});
+
+test("the settings dialog is painted in the room's tone", async ({ page }) => {
+  const dialogColour = async () =>
+    page.locator(".sheet__panel").evaluate((el) => getComputedStyle(el).backgroundColor);
+
+  await page.goto("/");
+  await page.getByTitle("Settings (,)").click();
+  const warm = await dialogColour();
+
+  await page.getByTitle("Ink").click();
+  const cool = await dialogColour();
+
+  expect(cool, "the dialog ignored the palette").not.toBe(warm);
+  // The panels behind it move too, rather than keeping a warm wash on a cool room.
+  const panel = await page
+    .locator(".tasks")
+    .evaluate((el) => getComputedStyle(el).borderTopColor);
+  expect(panel).not.toBe("rgb(255, 220, 170)");
+  await page.screenshot({ path: "e2e/.artifacts/17-settings-ink.png" });
 });

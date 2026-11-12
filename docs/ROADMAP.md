@@ -22,6 +22,9 @@ much it would improve a working day.
 - **Translations.** The UI is about forty strings.
 - **Reduced-motion polish.** It is respected today, but the transformation could
   be a tasteful fade instead of simply switching off.
+- **More room tones.** Seven is a start. Light ones are the interesting problem:
+  the mascot frames carry their own dark background, so a pale room needs the
+  feathered mask reworked.
 
 ## Deliberately not doing
 

@@ -3,9 +3,9 @@ import { ServiceWorker } from "@/components/ServiceWorker";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "nindo — my focus way",
+  title: "nindo · my focus way",
   description:
-    "A minimal, installable pomodoro with today's tasks, a mascot that powers up when you finish, and a quiet music player. Nothing leaves your browser.",
+    "A pomodoro that sits beside your editor: today's tasks, a mascot that powers up when you finish, and a quiet player. Nothing leaves your browser.",
   applicationName: "nindo",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "nindo", statusBarStyle: "black-translucent" },

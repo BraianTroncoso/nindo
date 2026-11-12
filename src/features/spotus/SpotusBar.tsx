@@ -43,7 +43,7 @@ export function SpotusBar() {
       if (mode === "paste") {
         const track = await trackFromInput(value);
         if (!track) {
-          setMessage("That is not a YouTube link. Paste a video or playlist URL.");
+          setMessage("That is not a YouTube link.");
         } else {
           // Queued, not forced: enqueue() only takes over when nothing plays.
           addTrack(track);
@@ -52,7 +52,7 @@ export function SpotusBar() {
       } else {
         const found = await youtubeByok.search(value, apiKey || undefined);
         setResults(found);
-        if (found.length === 0) setMessage("Nothing came back for that.");
+        if (found.length === 0) setMessage("No results.");
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Something went wrong.");
@@ -78,7 +78,7 @@ export function SpotusBar() {
             className="chip"
             data-on={mode === "search" ? "" : undefined}
             onClick={() => setMode("search")}
-            title={apiKey ? "Search YouTube" : "Needs your own YouTube API key (settings)"}
+            title={apiKey ? "Search YouTube" : "Needs your own YouTube API key. See settings."}
           >
             search{apiKey ? "" : " *"}
           </button>
@@ -90,7 +90,7 @@ export function SpotusBar() {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder={
-              mode === "paste" ? "paste a YouTube video or playlist URL" : "search YouTube…"
+              mode === "paste" ? "paste a YouTube link" : "search YouTube"
             }
             aria-label={mode === "paste" ? "YouTube URL" : "Search query"}
           />
@@ -180,8 +180,8 @@ export function SpotusBar() {
               />
             ) : (
               <p className="player__empty">
-                Paste a YouTube link to start. Add as many as you like — they queue up,
-                and when the last one ends YouTube&rsquo;s own mix keeps going.
+                Paste a YouTube link. Add as many as you like: they wait their turn,
+                and once the last one ends YouTube&rsquo;s mix keeps the music going.
               </p>
             )}
           </div>

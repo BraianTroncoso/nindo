@@ -114,7 +114,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         <section className="sheet__group">
           <h3>Room tone</h3>
           <p className="sheet__note">
-            The background you will be staring at all day. All of them are dim on purpose.
+            The background you will be looking at all day. Every one of them is dim on purpose.
           </p>
           <div className="swatches">
             <button
@@ -192,16 +192,15 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               checked={settings.zenShowTrack}
               onChange={(e) => updateSettings({ zenShowTrack: e.target.checked })}
             />
-            Show what is playing in zen mode
+            Name the track in fullscreen
           </label>
         </section>
 
         <section className="sheet__group">
           <h3>Spotus search</h3>
           <p className="sheet__note">
-            Search needs a YouTube Data API key. It is stored in this browser only and spends your
-            own quota — nindo has no server to put a key on. Paste-a-link and local files work
-            without any of this.
+            Search needs a YouTube Data API key of your own. nindo has no server to keep one on,
+            so it stays in this browser and spends your quota. Pasting links works without it.
           </p>
           <div className="sheet__key">
             <input
@@ -236,8 +235,8 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
         <footer className="sheet__foot">
           <p>
-            Everything above lives in this browser&rsquo;s localStorage. No account, no server, no
-            analytics. Today&rsquo;s tasks are wiped when the date changes.
+            Everything above stays in this browser. No account, no server, no analytics.
+            Today&rsquo;s tasks clear when the date changes.
           </p>
         </footer>
       </div>
