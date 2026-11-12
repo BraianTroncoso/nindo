@@ -31,9 +31,9 @@ stands up transformed.
 
 <div align="center">
 
-| While you focus | The moment it ends |
-|---|---|
-| <img src="docs/screenshots/01-focus.png" alt="Focus session in progress" width="420"> | <img src="docs/screenshots/02-transform.png" alt="The mascot mid-transformation, eyes opening, light flaring" width="420"> |
+| 1 · while you focus | 2 · the flash | 3 · transformed |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/01-focus.png" alt="A focus session in progress, the mascot meditating" width="290"> | <img src="docs/screenshots/02-transform.png" alt="The timer hits zero: light flares and the eyes open" width="290"> | <img src="docs/screenshots/03-sage.png" alt="Sage mode, standing transformed, with the break queued" width="290"> |
 
 </div>
 
@@ -46,8 +46,6 @@ product; everything else exists to not break that loop.
 
 ### Today's list, and nothing older
 
-<img src="docs/screenshots/03-sage.png" alt="Sage mode: the transformed mascot above the break countdown" align="right" width="330">
-
 A list that lives for exactly one day. Point the timer at a task and finishing a
 session credits it with a dot. Tomorrow it starts empty, on purpose: a pomodoro
 app that keeps score becomes another thing you owe.
@@ -57,11 +55,7 @@ switching tabs for an hour or restarting the browser all leave it correct. A
 session that ended while you were away reports itself once and queues the break,
 instead of silently racing through the cycles you missed.
 
-<br clear="right">
-
 ### A mascot that is yours to change
-
-<img src="docs/screenshots/04-settings.png" alt="Settings: rhythm presets, mascot picker, room tone swatches and signal toggles" align="right" width="330">
 
 Naruto ships as pack #1, playing the real sage-mode awakening frame by frame.
 `ember` is the original CC0 one. **Adding your own is a folder and two pictures:**
@@ -74,15 +68,14 @@ Or switch the mascot off entirely and let the clock take the middle.
 
 Pick the background you will be looking at all day, or leave it on `auto` and
 let the mascot choose. Every one of them is dim on purpose, and the choice
-repaints the whole screen: panels, buttons, the glow on the clock, the aura.
-
-<br clear="right">
+repaints the whole screen at once: panels, buttons, the glow on the clock, the
+mascot's aura.
 
 <div align="center">
 
-<img src="docs/screenshots/05-tone-moss.png" alt="The same screen in the Moss tone: a deep green room with a soft green accent" width="700">
-
-*the same app, in `moss`*
+| Everything lives in one dialog | The same app, in `moss` |
+|:---:|:---:|
+| <img src="docs/screenshots/04-settings.png" alt="Settings: rhythm presets, the mascot picker, room tone swatches and signal toggles" width="400"> | <img src="docs/screenshots/05-tone-moss.png" alt="The same screen in the Moss tone: a deep green room with a soft green accent" width="440"> |
 
 </div>
 
