@@ -28,6 +28,13 @@ GET https://www.youtube.com/oembed?url=<encoded>&format=json
 If YouTube declines to answer, the track still queues with its id as the title.
 A song that plays under an ugly name beats an error you cannot act on.
 
+Note that resolving a title and being allowed to play are two different things.
+Some uploads — live streams especially — are published with embedding turned
+off, and the player refuses them even though oEmbed happily returns the title.
+nindo says so (*"YouTube refused to play that one"*) instead of sitting on a
+silent black rectangle. Nothing can be done about it from this side: it is the
+uploader's setting.
+
 **2. Search, with your own API key.** Settings → *Spotus search* → paste a
 YouTube Data API v3 key. It is stored in your browser, spends **your** quota
 (10,000 units/day ≈ 100 searches), and is sent only to `googleapis.com`.

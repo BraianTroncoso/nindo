@@ -170,13 +170,13 @@ test("a pasted YouTube link resolves its real title with no API key", async ({ p
 
   await page
     .getByLabel("YouTube URL")
-    .fill("https://www.youtube.com/watch?v=jfKfPfyJRdk");
+    .fill("https://www.youtube.com/watch?v=lTRiuFIWV54");
   await page.getByRole("button", { name: "Add", exact: true }).click();
 
   // oEmbed is keyless and CORS-enabled, so the title arrives client-side.
   const title = page.locator(".queue__item .spotus__title").first();
   await expect(title).toBeVisible({ timeout: 15_000 });
-  await expect(title).not.toHaveText("jfKfPfyJRdk", { timeout: 15_000 });
+  await expect(title).not.toHaveText("lTRiuFIWV54", { timeout: 15_000 });
   await page.screenshot(SHOT("07-spotus-queue"));
 
   expect(errors.filter((e) => !/youtube|googlevideo|doubleclick/i.test(e))).toEqual([]);
@@ -357,7 +357,7 @@ test("zen leaves only the mascot, the clock and what is playing", async ({ page 
   await page.goto("/");
 
   // Queue something so there is a track to report.
-  await page.getByLabel("YouTube URL").fill("https://www.youtube.com/watch?v=jfKfPfyJRdk");
+  await page.getByLabel("YouTube URL").fill("https://www.youtube.com/watch?v=lTRiuFIWV54");
   await page.getByRole("button", { name: "Add", exact: true }).click();
   await expect(page.locator(".queue__item .spotus__title").first()).toBeVisible({
     timeout: 15_000,
